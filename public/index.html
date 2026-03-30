@@ -528,8 +528,7 @@
     </div>
   </div>
 
-  <!-- 5. Content filters -->
-  <div class="divider"><span class="divider-label">Step 5 — Content Filters</span></div>
+ <div class="divider"><span class="divider-label">Step 5 — Content Filters &amp; Optimizations</span></div>
   <div class="card">
     <div class="card-label">Content Type Filter</div>
     <div class="card-sublabel">Select which content types to expose. Leave all unselected to pass all types through.</div>
@@ -541,6 +540,48 @@
     </div>
     <div style="font-size:11px;color:var(--muted);margin-top:8px;">
       Upstream-unavailable types are automatically excluded even if selected.
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="card-label">Advanced Optimizations</div>
+    <div class="check-grid">
+      <label class="check-item" id="chk-offline" data-color="green">
+        <input type="checkbox" id="offlineCache" />
+        <div class="checkmark"><svg width="9" height="7" viewBox="0 0 9 7"><path d="M1 3.5l2.5 2.5 4.5-5" stroke="#000" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" fill="none"/></svg></div>
+        <div><div class="check-text">Offline Cache</div><div class="check-desc">Show cached content if upstream fails</div></div>
+      </label>
+      <label class="check-item" id="chk-notrailers" data-color="red">
+        <input type="checkbox" id="removeTrailers" />
+        <div class="checkmark"><svg width="9" height="7" viewBox="0 0 9 7"><path d="M1 3.5l2.5 2.5 4.5-5" stroke="#000" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" fill="none"/></svg></div>
+        <div><div class="check-text">Remove Trailers</div><div class="check-desc">Strip YouTube trailers from metadata</div></div>
+      </label>
+      <label class="check-item" id="chk-noartwork" data-color="red">
+        <input type="checkbox" id="removeHeavyArtwork" />
+        <div class="checkmark"><svg width="9" height="7" viewBox="0 0 9 7"><path d="M1 3.5l2.5 2.5 4.5-5" stroke="#000" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" fill="none"/></svg></div>
+        <div><div class="check-text">Strip Heavy Artwork</div><div class="check-desc">Remove backgrounds and banners to save data</div></div>
+      </label>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="card-label">Stream Filters</div>
+    <div class="check-grid">
+      <label class="check-item" id="chk-https" data-color="green">
+        <input type="checkbox" id="forceHttpsStreams" />
+        <div class="checkmark"><svg width="9" height="7" viewBox="0 0 9 7"><path d="M1 3.5l2.5 2.5 4.5-5" stroke="#000" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" fill="none"/></svg></div>
+        <div><div class="check-text">Force HTTPS</div><div class="check-desc">Rewrite http:// stream URLs to https://</div></div>
+      </label>
+      <label class="check-item" id="chk-torrents" data-color="red">
+        <input type="checkbox" id="stripTorrents" />
+        <div class="checkmark"><svg width="9" height="7" viewBox="0 0 9 7"><path d="M1 3.5l2.5 2.5 4.5-5" stroke="#000" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" fill="none"/></svg></div>
+        <div><div class="check-text">Strip Torrents</div><div class="check-desc">Remove infoHash-based P2P streams</div></div>
+      </label>
+      <label class="check-item" id="chk-magnets" data-color="red">
+        <input type="checkbox" id="stripMagnetStreams" />
+        <div class="checkmark"><svg width="9" height="7" viewBox="0 0 9 7"><path d="M1 3.5l2.5 2.5 4.5-5" stroke="#000" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" fill="none"/></svg></div>
+        <div><div class="check-text">Strip Magnets</div><div class="check-desc">Remove magnet: link streams</div></div>
+      </label>
     </div>
   </div>
 
@@ -794,6 +835,7 @@ async function previewManifest() {
   }
 }
 
+// Replace renderPreview(data) in the `<script>` block
 function renderPreview(data) {
   const inner = document.getElementById('preview-inner');
   const v = data.validation;
@@ -828,8 +870,14 @@ function renderPreview(data) {
 
   // Auto-select type pills that match this addon's types
   if (v.valid && v.types.length) {
-    // Don't auto-select — leave user choice intact
-    // But disable pills not offered by upstream
+    const typeGrid = document.getElementById('typeGrid');
+    const existingTypes = new Set([...document.querySelectorAll('.type-pill')].map(p => p.dataset.type));
+    v.types.forEach(t => {
+        if (!existingTypes.has(t)) {
+            typeGrid.insertAdjacentHTML('beforeend', `<div class="type-pill" data-type="${esc(t)}" onclick="toggleType(this)">${esc(t)}</div>`);
+        }
+    });
+
     document.querySelectorAll('.type-pill').forEach(pill => {
       const available = v.types.includes(pill.dataset.type);
       pill.style.opacity = available ? '1' : '0.35';
@@ -908,6 +956,17 @@ async function createProxy() {
     metaCacheTtl:     Number(document.getElementById('metaCacheTtl').value) || 0,
     streamCacheTtl:   Number(document.getElementById('streamCacheTtl').value) || 0,
     subtitleCacheTtl: Number(document.getElementById('subtitleCacheTtl').value) || 0,
+
+    // Add the new fields in createProxy() payload mappings
+    allowedTypes: getSelectedTypes(),
+    forceHttpsStreams:  document.getElementById('forceHttpsStreams').checked,
+    stripTorrents:      document.getElementById('stripTorrents').checked,
+    stripMagnetStreams: document.getElementById('stripMagnetStreams').checked,
+    stripAdultFlag:     document.getElementById('stripAdultFlag').checked,
+    stripP2PFlag:       document.getElementById('stripP2PFlag').checked,
+    offlineCache:       document.getElementById('offlineCache').checked,
+    removeTrailers:     document.getElementById('removeTrailers').checked,
+    removeHeavyArtwork: document.getElementById('removeHeavyArtwork').checked,
   };
 
   try {

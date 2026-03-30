@@ -14,6 +14,7 @@ const MANIFEST_MAX_BYTES  = 8192;
 
 // ─── Data model ───────────────────────────────────────────────────────────────
 
+// Replace the ProxyConfig interface
 interface ProxyConfig {
   id: string;
   upstreamBaseUrl: string;
@@ -39,13 +40,16 @@ interface ProxyConfig {
   enableSubtitles: boolean;
   enableSearch: boolean;         // strips search extra from catalog definitions
 
-  // Content filters
+  // Content filters & Advanced optimizations
   allowedTypes: string[];        // empty = all
   forceHttpsStreams: boolean;    // rewrite http:// stream URLs to https://
   stripTorrents: boolean;        // remove infoHash-based streams
   stripMagnetStreams: boolean;   // remove magnet: URLs
   stripAdultFlag: boolean;       // remove manifest.behaviorHints.adult
   stripP2PFlag: boolean;         // remove manifest.behaviorHints.p2p
+  offlineCache: boolean;         // serve stale content if upstream is down
+  removeTrailers: boolean;       // strip trailers from metadata
+  removeHeavyArtwork: boolean;   // strip background/banner from metadata
 
   // Subtitle language whitelist (ISO 639-2, empty = all)
   subtitleLanguages: string[];
@@ -58,7 +62,6 @@ interface ProxyConfig {
 
   createdAt: number;
 }
-
 // ─── Stremio types (minimal) ──────────────────────────────────────────────────
 
 interface StremioManifest {
@@ -203,6 +206,7 @@ function validateManifest(raw: unknown): ValidationResult {
     result.warnings.push("manifest.description is missing or empty");
   }
 
+// Replace the resources and types validation blocks in validateManifest()
   // ── resources: must be non-empty array of valid resource names ──────────────
   if (!Array.isArray(m.resources) || m.resources.length === 0) {
     result.errors.push("manifest.resources must be a non-empty array");
@@ -210,13 +214,16 @@ function validateManifest(raw: unknown): ValidationResult {
     for (const r of m.resources) {
       const name =
         typeof r === "string" ? r : (typeof r === "object" && r !== null ? (r as Record<string, unknown>).name : undefined);
-      if (typeof name !== "string" || !VALID_RESOURCES.has(name)) {
-        result.errors.push(
-          `manifest.resources contains invalid resource "${name}". Valid: ${[...VALID_RESOURCES].join(", ")}`,
-        );
-      } else {
-        result.resources.push(name);
+      if (typeof name !== "string" || !name) {
+        result.errors.push("manifest.resources contains an invalid resource format");
+        continue;
       }
+      if (!VALID_RESOURCES.has(name)) {
+        result.warnings.push(
+          `manifest.resources contains unknown resource "${name}". (Custom resources are allowed but may not work in all clients)`
+        );
+      }
+      result.resources.push(name);
     }
     result.hasCatalog   = result.resources.includes("catalog");
     result.hasMeta      = result.resources.includes("meta");
@@ -230,12 +237,11 @@ function validateManifest(raw: unknown): ValidationResult {
   } else {
     for (const t of m.types) {
       if (!VALID_TYPES.has(t as string)) {
-        result.errors.push(
-          `manifest.types contains unknown type "${t}". Valid: ${[...VALID_TYPES].join(", ")}`,
+        result.warnings.push(
+          `manifest.types contains unknown type "${t}". (Custom types like anime are permitted)`
         );
-      } else {
-        result.types.push(t as string);
       }
+      result.types.push(t as string);
     }
   }
 
@@ -298,11 +304,26 @@ function err(msg: string, status = 400, details?: unknown): Response {
   return json({ error: msg, ...(details ? { details } : {}) }, status);
 }
 
-function jsonWithCache(data: unknown, ttl: number): Response {
+// Replace jsonWithCache function
+function jsonWithCache(data: unknown, ttl: number, offlineCache = false): Response {
   const res = json(data);
-  if (ttl <= 0) return res;
+  if (ttl <= 0 && !offlineCache) return res;
+  
   const headers = new Headers(res.headers);
-  headers.set("Cache-Control", `max-age=${ttl}, public`);
+  let cc = "";
+  
+  if (ttl > 0) cc += `max-age=${ttl}, public`;
+  else cc += `public`;
+  
+  if (offlineCache) {
+    cc += (cc ? ", " : "") + "stale-while-revalidate=31536000, stale-if-error=31536000";
+  }
+  
+  if (!cc.includes("max-age") && cc.includes("stale")) {
+    cc = `max-age=0, ${cc}`;
+  }
+  
+  headers.set("Cache-Control", cc);
   return new Response(res.body, { status: 200, headers });
 }
 
@@ -354,6 +375,7 @@ async function putConfig(cfg: ProxyConfig, env: Env): Promise<void> {
 
 // ─── Content transformers ─────────────────────────────────────────────────────
 
+// Replace patchMeta function
 function patchMeta(meta: StremioMeta, cfg: ProxyConfig): StremioMeta {
   const vars = { id: meta.id, type: meta.type };
   const out  = { ...meta };
@@ -368,6 +390,15 @@ function patchMeta(meta: StremioMeta, cfg: ProxyConfig): StremioMeta {
   if (background) out.background = background;
   if (banner)     out.banner     = banner;
 
+  if (cfg.removeHeavyArtwork) {
+    delete out.background;
+    delete out.banner;
+  }
+  
+  if (cfg.removeTrailers) {
+    delete out.trailers;
+  }
+
   // posterShape (square | poster | landscape)
   if (cfg.posterShape && VALID_POSTER_SHAPES.has(cfg.posterShape)) {
     out.posterShape = cfg.posterShape;
@@ -379,15 +410,23 @@ function patchMeta(meta: StremioMeta, cfg: ProxyConfig): StremioMeta {
   }
 
   // Video thumbnails — covers series episodes, channel uploads
-  if (Array.isArray(out.videos) && cfg.thumbnailUrl) {
+  if (Array.isArray(out.videos)) {
     out.videos = (out.videos as StremioVideo[]).map((v) => {
-      const thumb = applyTemplate(cfg.thumbnailUrl, {
-        id: v.id,
-        type: meta.type,
-        season:  v.season  ?? "",
-        episode: v.episode ?? "",
-      });
-      return thumb ? { ...v, thumbnail: thumb } : v;
+      const vOut = { ...v };
+      if (cfg.thumbnailUrl) {
+        const thumb = applyTemplate(cfg.thumbnailUrl, {
+          id: v.id,
+          type: meta.type,
+          season:  v.season  ?? "",
+          episode: v.episode ?? "",
+        });
+        if (thumb) vOut.thumbnail = thumb;
+      }
+      if (cfg.removeTrailers) {
+        delete vOut.trailers;
+        delete vOut.trailer;
+      }
+      return vOut;
     });
   }
 
@@ -521,9 +560,10 @@ async function handleCreate(req: Request, env: Env, workerUrl: string): Promise<
     return err(`posterShape must be one of: ${[...VALID_POSTER_SHAPES].filter(Boolean).join(", ")}`);
   }
 
-  // Allowed types must be a subset of what the upstream offers
+  // Replace the variable extractions in handleCreate
+  // Allowed types must be a subset of what the upstream offers, but we no longer limit to VALID_TYPES
   const allowedTypes = (body.allowedTypes ?? []).filter(
-    (t) => VALID_TYPES.has(t) && validation.types.includes(t),
+    (t) => validation.types.includes(t),
   );
 
   // Subtitle language codes: basic sanity (2-3 chars)
@@ -550,16 +590,20 @@ async function handleCreate(req: Request, env: Env, workerUrl: string): Promise<
 
     enableCatalog:   body.enableCatalog   ?? true,
     enableMeta:      body.enableMeta      ?? true,
-    enableStreams:    body.enableStreams   ?? true,
+    enableStreams:   body.enableStreams   ?? true,
     enableSubtitles: body.enableSubtitles ?? true,
     enableSearch:    body.enableSearch    ?? true,
 
     allowedTypes,
     forceHttpsStreams:  body.forceHttpsStreams  ?? false,
     stripTorrents:      body.stripTorrents      ?? false,
-    stripMagnetStreams: body.stripMagnetStreams  ?? false,
+    stripMagnetStreams: body.stripMagnetStreams ?? false,
     stripAdultFlag:     body.stripAdultFlag     ?? false,
     stripP2PFlag:       body.stripP2PFlag       ?? false,
+    
+    offlineCache:       body.offlineCache       ?? false,
+    removeTrailers:     body.removeTrailers     ?? false,
+    removeHeavyArtwork: body.removeHeavyArtwork ?? false,
 
     subtitleLanguages,
 
@@ -635,7 +679,7 @@ async function handleCatalog(
   catch (e) { return err(`Upstream error: ${(e as Error).message}`, 502); }
 
   const metas = (upstream.metas ?? []).map((m) => patchMeta(m, cfg));
-  return jsonWithCache({ metas }, cfg.catalogCacheTtl);
+return jsonWithCache({ metas }, cfg.catalogCacheTtl, cfg.offlineCache);
 }
 
 async function handleMeta(
@@ -652,7 +696,7 @@ async function handleMeta(
   catch (e) { return err(`Upstream error: ${(e as Error).message}`, 502); }
 
   const meta = upstream.meta ? patchMeta(upstream.meta, cfg) : null;
-  return jsonWithCache({ meta }, cfg.metaCacheTtl);
+return jsonWithCache({ meta }, cfg.metaCacheTtl, cfg.offlineCache);
 }
 
 async function handleStream(
@@ -672,7 +716,7 @@ async function handleStream(
     .map((s) => filterStream(s, cfg))
     .filter((s): s is StremioStream => s !== null);
 
-  return jsonWithCache({ streams }, cfg.streamCacheTtl);
+return jsonWithCache({ streams }, cfg.streamCacheTtl, cfg.offlineCache);
 }
 
 async function handleSubtitles(
@@ -691,7 +735,7 @@ async function handleSubtitles(
   if (cfg.subtitleLanguages.length > 0) {
     subtitles = subtitles.filter((s) => cfg.subtitleLanguages.includes(s.lang));
   }
-  return jsonWithCache({ subtitles }, cfg.subtitleCacheTtl);
+return jsonWithCache({ subtitles }, cfg.subtitleCacheTtl, cfg.offlineCache);
 }
 
 async function handleAddonCatalog(
