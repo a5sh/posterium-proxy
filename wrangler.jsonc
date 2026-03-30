@@ -1,4 +1,4 @@
-// /home/claude/posterium-proxy/wrangler.jsonc
+// wrangler.jsonc — PosteriumProxy v3
 {
   "name": "posterium-proxy",
   "main": "src/index.ts",
@@ -13,17 +13,25 @@
   // Static frontend served from /public
   "assets": {
     "directory": "./public/",
+    "not_found_handling": "single-page-application",
     "binding": "ASSETS"
   },
 
-  // KV namespace for storing proxy configs
-  // Replace the id values after running:
-  //   npx wrangler kv namespace create PROXY_CONFIGS
-  //   npx wrangler kv namespace create PROXY_CONFIGS --preview
+  // KV namespace for proxy configs
+  // Run: npx wrangler kv namespace create PROXY_CONFIGS
   "kv_namespaces": [
     {
       "binding": "PROXY_CONFIGS",
       "id": "4ee10667a5c548e4b75ba3e23cc82701"
     }
-  ]
+  ],
+
+  // Environment variables
+  // IMPORTANT: Change ADMIN_PASSWORD before deploying to production!
+  "vars": {
+    "ADMIN_PASSWORD": "admin123"
+  }
+
+  // Production secrets (use wrangler secret put ADMIN_PASSWORD):
+  // npx wrangler secret put ADMIN_PASSWORD
 }

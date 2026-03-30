@@ -9,356 +9,135 @@
   <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=DM+Sans:ital,wght@0,300;0,400;0,500;1,300&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet" />
   <style>
     *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
-
     :root {
-      --black:  #080808;
-      --dark:   #111111;
-      --char:   #1a1a1a;
-      --border: #2a2a2a;
-      --muted:  #3d3d3d;
-      --silver: #8a8a8a;
-      --cream:  #d4cfc7;
-      --amber:  #e8a428;
-      --amber2: #f5c156;
-      --red:    #c0392b;
-      --green:  #27ae60;
-      --blue:   #2980b9;
-      --radius: 6px;
-      --tr:     0.16s ease;
+      --black:#080808; --dark:#111111; --char:#1a1a1a; --border:#2a2a2a;
+      --muted:#3d3d3d; --silver:#8a8a8a; --cream:#d4cfc7;
+      --amber:#e8a428; --amber2:#f5c156; --red:#c0392b; --green:#27ae60; --blue:#2980b9;
+      --radius:6px; --tr:0.16s ease;
     }
-
     html { scroll-behavior: smooth; }
-    body {
-      background: var(--black);
-      color: var(--cream);
-      font-family: 'DM Sans', sans-serif;
-      font-weight: 300;
-      font-size: 15px;
-      line-height: 1.6;
-      min-height: 100vh;
-      overflow-x: hidden;
-    }
-
-    /* Grain */
-    body::before {
-      content: '';
-      position: fixed;
-      inset: 0;
-      background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.04'/%3E%3C/svg%3E");
-      pointer-events: none;
-      z-index: 9999;
-      opacity: 0.3;
-    }
-
-    /* Film strip */
-    .film-strip {
-      height: 26px;
-      background: var(--dark);
-      border-bottom: 1px solid var(--border);
-      overflow: hidden;
-      position: relative;
-    }
-    .film-strip::after {
-      content: '';
-      display: block;
-      height: 13px;
-      position: absolute;
-      top: 50%;
-      left: 0; right: 0;
-      transform: translateY(-50%);
-      background: repeating-linear-gradient(90deg,
-        transparent 0, transparent 18px,
-        var(--black) 18px, var(--black) 26px,
-        transparent 26px, transparent 44px);
-    }
-
-    /* Header */
-    header { padding: 44px 0 28px; text-align: center; }
-    .logo-line { display: flex; align-items: center; justify-content: center; gap: 14px; margin-bottom: 6px; }
-    .logo-hex {
-      width: 38px; height: 38px;
-      background: var(--amber);
-      clip-path: polygon(0 25%, 50% 0, 100% 25%, 100% 75%, 50% 100%, 0 75%);
-    }
-    h1 {
-      font-family: 'Bebas Neue', sans-serif;
-      font-size: clamp(34px, 6vw, 60px);
-      letter-spacing: 0.07em;
-      color: #fff;
-      line-height: 1;
-    }
-    h1 span { color: var(--amber); }
-    .tagline { font-size: 12px; color: var(--silver); letter-spacing: 0.14em; text-transform: uppercase; margin-top: 7px; }
-
-    /* Nav tabs */
-    .tab-bar {
-      display: flex;
-      justify-content: center;
-      gap: 4px;
-      margin: 28px 0 0;
-      padding: 0 24px;
-      border-bottom: 1px solid var(--border);
-    }
-    .tab {
-      font-family: 'Bebas Neue', sans-serif;
-      font-size: 13px;
-      letter-spacing: 0.14em;
-      color: var(--silver);
-      padding: 10px 18px;
-      cursor: pointer;
-      border-bottom: 2px solid transparent;
-      transition: all var(--tr);
-      user-select: none;
-      text-transform: uppercase;
-    }
-    .tab:hover { color: var(--cream); }
-    .tab.active { color: var(--amber); border-bottom-color: var(--amber); }
-
-    /* Tab pages */
-    .tab-page { display: none; }
-    .tab-page.active { display: block; }
-
-    /* Main */
-    main { max-width: 820px; margin: 0 auto; padding: 0 24px 80px; }
-
-    /* Divider */
-    .divider {
-      display: flex; align-items: center; gap: 12px;
-      margin: 28px 0 24px;
-    }
-    .divider::before, .divider::after { content: ''; flex: 1; height: 1px; background: var(--border); }
-    .divider-label { font-size: 11px; letter-spacing: 0.18em; text-transform: uppercase; color: var(--muted); white-space: nowrap; }
-
-    /* Cards */
-    .card {
-      background: var(--dark);
-      border: 1px solid var(--border);
-      border-radius: var(--radius);
-      padding: 24px;
-      margin-bottom: 16px;
-      transition: border-color var(--tr);
-    }
-    .card:hover { border-color: var(--muted); }
-    .card-label {
-      font-family: 'Bebas Neue', sans-serif;
-      font-size: 13px;
-      letter-spacing: 0.18em;
-      color: var(--amber);
-      margin-bottom: 16px;
-      display: flex;
-      align-items: center;
-      gap: 8px;
-    }
-    .card-label::before { content: ''; display: inline-block; width: 3px; height: 13px; background: var(--amber); border-radius: 2px; }
-    .card-sublabel { font-size: 12px; color: var(--silver); margin-bottom: 14px; line-height: 1.55; }
-
-    /* Form */
-    .field { margin-bottom: 16px; }
-    .field:last-child { margin-bottom: 0; }
-    label { display: block; font-size: 11px; letter-spacing: 0.1em; text-transform: uppercase; color: var(--silver); margin-bottom: 6px; }
-    label .hint { font-size: 11px; color: var(--muted); text-transform: none; letter-spacing: 0; margin-left: 6px; }
-
-    input[type="text"], input[type="url"], input[type="number"], textarea, select {
-      width: 100%;
-      background: var(--char);
-      border: 1px solid var(--border);
-      border-radius: var(--radius);
-      color: var(--cream);
-      font-family: 'JetBrains Mono', monospace;
-      font-size: 13px;
-      padding: 10px 12px;
-      outline: none;
-      transition: border-color var(--tr), background var(--tr);
-    }
-    input[type="text"]:focus,
-    input[type="url"]:focus,
-    input[type="number"]:focus,
-    textarea:focus,
-    select:focus { border-color: var(--amber); background: #161616; }
-    input::placeholder, textarea::placeholder { color: var(--muted); font-size: 12px; }
-    select { cursor: pointer; -webkit-appearance: none; appearance: none;
-      background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='6' viewBox='0 0 10 6'%3E%3Cpath d='M0 0l5 6 5-6z' fill='%238a8a8a'/%3E%3C/svg%3E");
-      background-repeat: no-repeat;
-      background-position: right 12px center;
-      padding-right: 32px;
-    }
-    select option { background: var(--char); }
-
-    .url-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; }
-    .grid-3   { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 14px; }
-    .grid-4   { display: grid; grid-template-columns: repeat(4, 1fr); gap: 14px; }
-    @media (max-width: 620px) { .url-grid, .grid-3, .grid-4 { grid-template-columns: 1fr; } }
-
-    /* Chips */
-    .chips { display: flex; gap: 5px; flex-wrap: wrap; margin-top: 5px; }
-    .chip {
-      background: var(--char); border: 1px solid var(--border); border-radius: 3px;
-      padding: 2px 7px; font-family: 'JetBrains Mono', monospace; font-size: 11px;
-      color: var(--amber); cursor: pointer; transition: all var(--tr);
-    }
-    .chip:hover { border-color: var(--amber); background: rgba(232,164,40,.08); }
-
-    /* Toggle checks */
-    .check-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(180px, 1fr)); gap: 10px; }
-    .check-item {
-      display: flex; align-items: flex-start; gap: 10px;
-      padding: 10px 13px;
-      background: var(--char); border: 1px solid var(--border); border-radius: var(--radius);
-      cursor: pointer; transition: border-color var(--tr), background var(--tr); user-select: none;
-    }
-    .check-item:hover { border-color: var(--muted); }
-    .check-item input[type="checkbox"] { display: none; }
-    .check-item.checked { border-color: var(--amber); background: rgba(232,164,40,.06); }
-    .check-item.checked-green { border-color: var(--green); background: rgba(39,174,96,.06); }
-    .check-item.checked-red   { border-color: var(--red);   background: rgba(192,57,43,.06); }
-    .checkmark {
-      width: 17px; height: 17px; flex-shrink: 0; margin-top: 1px;
-      border: 1.5px solid var(--muted); border-radius: 3px;
-      display: flex; align-items: center; justify-content: center;
-      transition: all var(--tr);
-    }
-    .check-item.checked .checkmark    { border-color: var(--amber); background: var(--amber); }
-    .check-item.checked-green .checkmark { border-color: var(--green); background: var(--green); }
-    .check-item.checked-red .checkmark   { border-color: var(--red);   background: var(--red);   }
-    .checkmark svg { display: none; }
+    body { background:var(--black); color:var(--cream); font-family:'DM Sans',sans-serif; font-weight:300; font-size:15px; line-height:1.6; min-height:100vh; overflow-x:hidden; }
+    body::before { content:''; position:fixed; inset:0; background-image:url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.04'/%3E%3C/svg%3E"); pointer-events:none; z-index:9999; opacity:.3; }
+    .film-strip { height:26px; background:var(--dark); border-bottom:1px solid var(--border); overflow:hidden; position:relative; }
+    .film-strip::after { content:''; display:block; height:13px; position:absolute; top:50%; left:0; right:0; transform:translateY(-50%); background:repeating-linear-gradient(90deg,transparent 0,transparent 18px,var(--black) 18px,var(--black) 26px,transparent 26px,transparent 44px); }
+    header { padding:36px 0 20px; text-align:center; }
+    .logo-line { display:flex; align-items:center; justify-content:center; gap:14px; margin-bottom:6px; }
+    .logo-hex { width:36px; height:36px; background:var(--amber); clip-path:polygon(0 25%,50% 0,100% 25%,100% 75%,50% 100%,0 75%); }
+    h1 { font-family:'Bebas Neue',sans-serif; font-size:clamp(32px,6vw,56px); letter-spacing:.07em; color:#fff; line-height:1; }
+    h1 span { color:var(--amber); }
+    .tagline { font-size:12px; color:var(--silver); letter-spacing:.14em; text-transform:uppercase; margin-top:6px; }
+    .tab-bar { display:flex; justify-content:center; gap:4px; margin:24px 0 0; padding:0 24px; border-bottom:1px solid var(--border); }
+    .tab { font-family:'Bebas Neue',sans-serif; font-size:13px; letter-spacing:.14em; color:var(--silver); padding:10px 18px; cursor:pointer; border-bottom:2px solid transparent; transition:all var(--tr); user-select:none; text-transform:uppercase; }
+    .tab:hover { color:var(--cream); }
+    .tab.active { color:var(--amber); border-bottom-color:var(--amber); }
+    .tab-page { display:none; }
+    .tab-page.active { display:block; }
+    main { max-width:840px; margin:0 auto; padding:0 24px 80px; }
+    .divider { display:flex; align-items:center; gap:12px; margin:28px 0 20px; }
+    .divider::before,.divider::after { content:''; flex:1; height:1px; background:var(--border); }
+    .divider-label { font-size:11px; letter-spacing:.18em; text-transform:uppercase; color:var(--muted); white-space:nowrap; }
+    .card { background:var(--dark); border:1px solid var(--border); border-radius:var(--radius); padding:22px; margin-bottom:14px; transition:border-color var(--tr); }
+    .card:hover { border-color:var(--muted); }
+    .card-label { font-family:'Bebas Neue',sans-serif; font-size:13px; letter-spacing:.18em; color:var(--amber); margin-bottom:14px; display:flex; align-items:center; gap:8px; }
+    .card-label::before { content:''; display:inline-block; width:3px; height:13px; background:var(--amber); border-radius:2px; }
+    .card-sublabel { font-size:12px; color:var(--silver); margin-bottom:14px; line-height:1.55; }
+    .field { margin-bottom:14px; }
+    .field:last-child { margin-bottom:0; }
+    label { display:block; font-size:11px; letter-spacing:.1em; text-transform:uppercase; color:var(--silver); margin-bottom:5px; }
+    label .hint { font-size:11px; color:var(--muted); text-transform:none; letter-spacing:0; margin-left:6px; }
+    input[type=text],input[type=url],input[type=number],input[type=password],textarea,select { width:100%; background:var(--char); border:1px solid var(--border); border-radius:var(--radius); color:var(--cream); font-family:'JetBrains Mono',monospace; font-size:13px; padding:9px 12px; outline:none; transition:border-color var(--tr),background var(--tr); }
+    input:focus,textarea:focus,select:focus { border-color:var(--amber); background:#161616; }
+    input::placeholder,textarea::placeholder { color:var(--muted); font-size:12px; }
+    select { cursor:pointer; -webkit-appearance:none; appearance:none; background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='6' viewBox='0 0 10 6'%3E%3Cpath d='M0 0l5 6 5-6z' fill='%238a8a8a'/%3E%3C/svg%3E"); background-repeat:no-repeat; background-position:right 12px center; padding-right:32px; }
+    select option { background:var(--char); }
+    .g2 { display:grid; grid-template-columns:1fr 1fr; gap:14px; }
+    .g3 { display:grid; grid-template-columns:1fr 1fr 1fr; gap:14px; }
+    .g4 { display:grid; grid-template-columns:repeat(4,1fr); gap:14px; }
+    @media(max-width:600px){ .g2,.g3,.g4{grid-template-columns:1fr;} }
+    .chips { display:flex; gap:5px; flex-wrap:wrap; margin-top:5px; }
+    .chip { background:var(--char); border:1px solid var(--border); border-radius:3px; padding:2px 7px; font-family:'JetBrains Mono',monospace; font-size:11px; color:var(--amber); cursor:pointer; transition:all var(--tr); }
+    .chip:hover { border-color:var(--amber); background:rgba(232,164,40,.08); }
+    .check-grid { display:grid; grid-template-columns:repeat(auto-fill,minmax(170px,1fr)); gap:9px; }
+    .check-item { display:flex; align-items:flex-start; gap:10px; padding:9px 12px; background:var(--char); border:1px solid var(--border); border-radius:var(--radius); cursor:pointer; transition:border-color var(--tr),background var(--tr); user-select:none; }
+    .check-item:hover { border-color:var(--muted); }
+    .check-item input[type=checkbox]{ display:none; }
+    .check-item.checked    { border-color:var(--amber); background:rgba(232,164,40,.06); }
+    .check-item.checked-gr { border-color:var(--green); background:rgba(39,174,96,.06); }
+    .check-item.checked-rd { border-color:var(--red);   background:rgba(192,57,43,.06); }
+    .checkmark { width:17px; height:17px; flex-shrink:0; margin-top:1px; border:1.5px solid var(--muted); border-radius:3px; display:flex; align-items:center; justify-content:center; transition:all var(--tr); }
+    .check-item.checked    .checkmark { border-color:var(--amber); background:var(--amber); }
+    .check-item.checked-gr .checkmark { border-color:var(--green); background:var(--green); }
+    .check-item.checked-rd .checkmark { border-color:var(--red);   background:var(--red); }
+    .checkmark svg { display:none; }
     .check-item.checked .checkmark svg,
-    .check-item.checked-green .checkmark svg,
-    .check-item.checked-red .checkmark svg { display: block; }
-    .check-text { font-size: 13px; color: var(--cream); line-height: 1.3; }
-    .check-desc { font-size: 11px; color: var(--silver); margin-top: 2px; line-height: 1.4; }
-
-    /* Type pills */
-    .type-grid { display: flex; gap: 8px; flex-wrap: wrap; }
-    .type-pill {
-      padding: 5px 14px; border: 1px solid var(--border); border-radius: 20px;
-      font-size: 12px; letter-spacing: 0.08em; text-transform: uppercase; cursor: pointer;
-      color: var(--silver); background: var(--char); transition: all var(--tr); user-select: none;
-    }
-    .type-pill:hover { border-color: var(--muted); color: var(--cream); }
-    .type-pill.selected { border-color: var(--amber); color: var(--amber); background: rgba(232,164,40,.08); }
-
-    /* Manifest preview card */
-    #preview-card { display: none; }
-    #preview-card.show { display: block; animation: fadeUp .25s ease; }
-    .preview-inner {
-      background: var(--char);
-      border: 1px solid var(--border);
-      border-radius: var(--radius);
-      padding: 16px;
-      margin-top: 12px;
-    }
-    .preview-name { font-family: 'Bebas Neue', sans-serif; font-size: 18px; letter-spacing: 0.1em; color: #fff; }
-    .preview-id   { font-family: 'JetBrains Mono', monospace; font-size: 11px; color: var(--silver); margin-top: 2px; }
-    .preview-tags { display: flex; gap: 6px; flex-wrap: wrap; margin-top: 10px; }
-    .preview-tag {
-      padding: 3px 9px; border-radius: 3px; font-size: 11px;
-      text-transform: uppercase; letter-spacing: 0.08em; font-weight: 500;
-    }
-    .tag-resource { background: rgba(41,128,185,.2); color: #5dade2; border: 1px solid rgba(41,128,185,.3); }
-    .tag-type     { background: rgba(232,164,40,.12); color: var(--amber); border: 1px solid rgba(232,164,40,.25); }
-    .tag-warn     { background: rgba(192,57,43,.12); color: #e74c3c; border: 1px solid rgba(192,57,43,.25); }
-    .preview-errors { margin-top: 10px; }
-    .preview-err  { font-size: 12px; color: #e74c3c; display: flex; gap: 6px; align-items: flex-start; margin-top: 4px; }
-    .preview-warn { font-size: 12px; color: #e67e22; display: flex; gap: 6px; align-items: flex-start; margin-top: 4px; }
-    .preview-loading { font-size: 12px; color: var(--silver); padding: 8px 0; }
-
-    /* Buttons */
-    .btn-primary {
-      width: 100%; padding: 14px 24px;
-      background: var(--amber); color: var(--black);
-      border: none; border-radius: var(--radius);
-      font-family: 'Bebas Neue', sans-serif; font-size: 17px; letter-spacing: 0.12em;
-      cursor: pointer; transition: background var(--tr), transform .1s;
-      margin-top: 6px;
-    }
-    .btn-primary:hover { background: var(--amber2); }
-    .btn-primary:active { transform: scale(.99); }
-    .btn-primary:disabled { background: var(--muted); cursor: not-allowed; color: var(--silver); }
-
-    .btn-sm {
-      padding: 6px 14px; font-size: 12px; border: 1px solid var(--border);
-      background: var(--char); color: var(--silver); border-radius: var(--radius);
-      cursor: pointer; transition: all var(--tr); font-family: inherit;
-    }
-    .btn-sm:hover { border-color: var(--amber); color: var(--amber); }
-
-    /* Spinner */
-    .spinner {
-      width: 16px; height: 16px;
-      border: 2px solid rgba(0,0,0,.3); border-top-color: var(--black);
-      border-radius: 50%; animation: spin .7s linear infinite;
-      display: inline-block; vertical-align: middle; margin-right: 7px;
-    }
-    @keyframes spin { to { transform: rotate(360deg); } }
-
-    /* Error / result */
-    #error {
-      display: none; background: rgba(192,57,43,.1); border: 1px solid rgba(192,57,43,.4);
-      border-radius: var(--radius); padding: 13px 16px; color: #e74c3c; font-size: 13px; margin-top: 12px;
-    }
-    #error.visible { display: block; animation: fadeUp .25s ease; }
-
-    #result { display: none; margin-top: 20px; }
-    #result.visible { display: block; animation: fadeUp .3s ease; }
-    @keyframes fadeUp { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
-
-    .result-card {
-      background: linear-gradient(135deg, #0e1a0a, #0a1500);
-      border: 1px solid #2a4020; border-radius: var(--radius); padding: 22px 26px;
-    }
-    .result-title {
-      font-family: 'Bebas Neue', sans-serif; font-size: 13px; letter-spacing: 0.18em;
-      color: var(--green); margin-bottom: 16px;
-      display: flex; align-items: center; gap: 8px;
-    }
-    .result-title::before {
-      content: '✓'; width: 19px; height: 19px; background: var(--green); color: #000;
-      border-radius: 50%; display: flex; align-items: center; justify-content: center;
-      font-size: 11px; flex-shrink: 0;
-    }
-    .result-row { margin-bottom: 13px; }
-    .result-label { font-size: 11px; letter-spacing: 0.1em; text-transform: uppercase; color: #5a7a50; margin-bottom: 5px; }
-    .result-url {
-      background: rgba(0,0,0,.4); border: 1px solid #2a4020; border-radius: 4px;
-      padding: 9px 11px; font-family: 'JetBrains Mono', monospace; font-size: 12px;
-      color: #8fcc70; word-break: break-all;
-      display: flex; align-items: center; justify-content: space-between; gap: 8px;
-    }
-    .copy-btn {
-      background: none; border: 1px solid #2a4020; color: #5a7a50;
-      padding: 3px 9px; border-radius: 3px; cursor: pointer; font-size: 11px;
-      white-space: nowrap; transition: all var(--tr); flex-shrink: 0;
-    }
-    .copy-btn:hover, .copy-btn.copied { border-color: var(--green); color: var(--green); }
-    .install-btn {
-      display: inline-flex; align-items: center; gap: 7px;
-      background: var(--green); color: #000; text-decoration: none;
-      padding: 11px 20px; border-radius: var(--radius);
-      font-family: 'Bebas Neue', sans-serif; font-size: 15px; letter-spacing: 0.1em;
-      transition: background var(--tr); margin-top: 14px;
-    }
-    .install-btn:hover { background: #2ecc71; }
-
-    /* Proxy list (manage tab) */
-    .proxy-list { display: flex; flex-direction: column; gap: 10px; }
-    .proxy-item {
-      background: var(--dark); border: 1px solid var(--border); border-radius: var(--radius);
-      padding: 16px; display: flex; align-items: center; justify-content: space-between; gap: 12px;
-    }
-    .proxy-item-info { flex: 1; min-width: 0; }
-    .proxy-item-url { font-family: 'JetBrains Mono', monospace; font-size: 12px; color: var(--silver); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
-    .proxy-item-name { font-size: 13px; color: var(--cream); margin-bottom: 3px; }
-    .proxy-item-date { font-size: 11px; color: var(--muted); margin-top: 3px; }
-    .proxy-item-actions { display: flex; gap: 6px; flex-shrink: 0; }
-    .btn-del { padding: 6px 12px; font-size: 11px; border: 1px solid rgba(192,57,43,.4); background: rgba(192,57,43,.08); color: #e74c3c; border-radius: 4px; cursor: pointer; transition: all var(--tr); font-family: inherit; }
-    .btn-del:hover { border-color: var(--red); background: rgba(192,57,43,.15); }
-    .empty-list { text-align: center; padding: 32px; color: var(--muted); font-size: 13px; }
-
-    footer { text-align: center; padding: 22px; border-top: 1px solid var(--border); font-size: 12px; color: var(--muted); letter-spacing: 0.06em; }
-    footer a { color: var(--silver); text-decoration: none; }
-    footer a:hover { color: var(--amber); }
-
-    code { font-family: 'JetBrains Mono', monospace; font-size: 11px; color: var(--amber); background: rgba(232,164,40,.1); padding: 1px 5px; border-radius: 3px; }
+    .check-item.checked-gr .checkmark svg,
+    .check-item.checked-rd .checkmark svg { display:block; }
+    .check-text { font-size:13px; color:var(--cream); line-height:1.3; }
+    .check-desc { font-size:11px; color:var(--silver); margin-top:2px; line-height:1.4; }
+    .type-grid { display:flex; gap:8px; flex-wrap:wrap; }
+    .type-pill { padding:5px 14px; border:1px solid var(--border); border-radius:20px; font-size:12px; letter-spacing:.08em; text-transform:uppercase; cursor:pointer; color:var(--silver); background:var(--char); transition:all var(--tr); user-select:none; }
+    .type-pill:hover { border-color:var(--muted); color:var(--cream); }
+    .type-pill.selected { border-color:var(--amber); color:var(--amber); background:rgba(232,164,40,.08); }
+    /* preview card */
+    #preview-card,#preview-card2 { display:none; }
+    #preview-card.show,#preview-card2.show { display:block; animation:fadeUp .25s ease; }
+    .preview-inner { background:var(--char); border:1px solid var(--border); border-radius:var(--radius); padding:14px; margin-top:10px; }
+    .preview-name { font-family:'Bebas Neue',sans-serif; font-size:17px; letter-spacing:.1em; color:#fff; }
+    .preview-id   { font-family:'JetBrains Mono',monospace; font-size:11px; color:var(--silver); margin-top:2px; }
+    .preview-tags { display:flex; gap:6px; flex-wrap:wrap; margin-top:8px; }
+    .preview-tag  { padding:2px 8px; border-radius:3px; font-size:11px; text-transform:uppercase; letter-spacing:.07em; }
+    .tag-resource { background:rgba(41,128,185,.2); color:#5dade2; border:1px solid rgba(41,128,185,.3); }
+    .tag-type     { background:rgba(232,164,40,.12); color:var(--amber); border:1px solid rgba(232,164,40,.25); }
+    .tag-warn     { background:rgba(192,57,43,.12); color:#e74c3c; border:1px solid rgba(192,57,43,.25); }
+    .preview-err  { font-size:12px; color:#e74c3c; margin-top:4px; }
+    .preview-warn { font-size:12px; color:#e67e22; margin-top:4px; }
+    .preview-loading { font-size:12px; color:var(--silver); padding:6px 0; }
+    /* Presets */
+    .preset-bar { display:flex; gap:8px; flex-wrap:wrap; margin-bottom:18px; }
+    .preset-btn { padding:5px 13px; border:1px solid var(--border); border-radius:20px; font-size:12px; color:var(--silver); background:var(--char); cursor:pointer; transition:all var(--tr); }
+    .preset-btn:hover { border-color:var(--amber); color:var(--amber); }
+    /* buttons */
+    .btn-primary { width:100%; padding:14px 24px; background:var(--amber); color:var(--black); border:none; border-radius:var(--radius); font-family:'Bebas Neue',sans-serif; font-size:17px; letter-spacing:.12em; cursor:pointer; transition:background var(--tr),transform .1s; margin-top:6px; }
+    .btn-primary:hover { background:var(--amber2); }
+    .btn-primary:active { transform:scale(.99); }
+    .btn-primary:disabled { background:var(--muted); cursor:not-allowed; color:var(--silver); }
+    .btn-danger { width:100%; padding:12px 24px; background:rgba(192,57,43,.15); color:#e74c3c; border:1px solid rgba(192,57,43,.35); border-radius:var(--radius); font-family:'Bebas Neue',sans-serif; font-size:15px; letter-spacing:.12em; cursor:pointer; transition:background var(--tr); margin-top:8px; }
+    .btn-danger:hover { background:rgba(192,57,43,.25); }
+    .btn-sm { padding:6px 14px; font-size:12px; border:1px solid var(--border); background:var(--char); color:var(--silver); border-radius:var(--radius); cursor:pointer; transition:all var(--tr); font-family:inherit; }
+    .btn-sm:hover { border-color:var(--amber); color:var(--amber); }
+    .spinner { width:15px; height:15px; border:2px solid rgba(0,0,0,.3); border-top-color:var(--black); border-radius:50%; animation:spin .7s linear infinite; display:inline-block; vertical-align:middle; margin-right:6px; }
+    @keyframes spin { to{transform:rotate(360deg);} }
+    #error,#error2 { display:none; background:rgba(192,57,43,.1); border:1px solid rgba(192,57,43,.4); border-radius:var(--radius); padding:13px 16px; color:#e74c3c; font-size:13px; margin-top:12px; }
+    #error.visible,#error2.visible { display:block; animation:fadeUp .25s ease; }
+    #result,#result2 { display:none; margin-top:20px; }
+    #result.visible,#result2.visible { display:block; animation:fadeUp .3s ease; }
+    @keyframes fadeUp { from{opacity:0;transform:translateY(10px);} to{opacity:1;transform:translateY(0);} }
+    .result-card { background:linear-gradient(135deg,#0e1a0a,#0a1500); border:1px solid #2a4020; border-radius:var(--radius); padding:20px 24px; }
+    .result-title { font-family:'Bebas Neue',sans-serif; font-size:13px; letter-spacing:.18em; color:var(--green); margin-bottom:14px; display:flex; align-items:center; gap:8px; }
+    .result-title::before { content:'✓'; width:18px; height:18px; background:var(--green); color:#000; border-radius:50%; display:flex; align-items:center; justify-content:center; font-size:10px; flex-shrink:0; }
+    .result-row { margin-bottom:12px; }
+    .result-label { font-size:11px; letter-spacing:.1em; text-transform:uppercase; color:#5a7a50; margin-bottom:4px; }
+    .result-url { background:rgba(0,0,0,.4); border:1px solid #2a4020; border-radius:4px; padding:8px 10px; font-family:'JetBrains Mono',monospace; font-size:12px; color:#8fcc70; word-break:break-all; display:flex; align-items:center; justify-content:space-between; gap:8px; }
+    .copy-btn { background:none; border:1px solid #2a4020; color:#5a7a50; padding:3px 8px; border-radius:3px; cursor:pointer; font-size:11px; white-space:nowrap; transition:all var(--tr); flex-shrink:0; }
+    .copy-btn:hover,.copy-btn.copied { border-color:var(--green); color:var(--green); }
+    .install-btn { display:inline-flex; align-items:center; gap:7px; background:var(--green); color:#000; text-decoration:none; padding:10px 18px; border-radius:var(--radius); font-family:'Bebas Neue',sans-serif; font-size:14px; letter-spacing:.1em; transition:background var(--tr); margin-top:14px; }
+    .install-btn:hover { background:#2ecc71; }
+    .save-note { font-size:11px; color:#5a7a50; margin-top:12px; padding:10px 12px; background:rgba(0,0,0,.3); border-radius:4px; border:1px solid #1a3010; }
+    .save-note strong { color:var(--amber); }
+    /* edit tab */
+    .load-box { background:var(--dark); border:1px solid var(--border); border-radius:var(--radius); padding:24px; margin-top:20px; }
+    .load-box-title { font-family:'Bebas Neue',sans-serif; font-size:16px; letter-spacing:.15em; color:var(--amber); margin-bottom:16px; }
+    /* password toggle */
+    .pw-wrap { position:relative; }
+    .pw-toggle { position:absolute; right:10px; top:50%; transform:translateY(-50%); background:none; border:none; color:var(--silver); cursor:pointer; font-size:12px; padding:4px; }
+    .pw-toggle:hover { color:var(--amber); }
+    code { font-family:'JetBrains Mono',monospace; font-size:11px; color:var(--amber); background:rgba(232,164,40,.1); padding:1px 5px; border-radius:3px; }
+    footer { text-align:center; padding:20px; border-top:1px solid var(--border); font-size:12px; color:var(--muted); letter-spacing:.06em; }
+    footer a { color:var(--silver); text-decoration:none; }
+    footer a:hover { color:var(--amber); }
+    /* Edit proxy highlight */
+    .edit-banner { background:rgba(232,164,40,.06); border:1px solid rgba(232,164,40,.2); border-radius:var(--radius); padding:12px 16px; margin-bottom:20px; font-size:13px; color:var(--amber); display:none; }
+    .edit-banner.show { display:block; }
   </style>
 </head>
 <body>
@@ -370,94 +149,87 @@
     <div class="logo-hex"></div>
     <h1>Posterium<span>Proxy</span></h1>
   </div>
-  <p class="tagline">Proxy any Stremio addon — replace artwork, filter content, rewrite metadata</p>
+  <p class="tagline">Proxy any Stremio addon — replace artwork, filter, transform, cache</p>
   <div class="tab-bar">
     <div class="tab active" data-tab="create">Create Proxy</div>
-    <div class="tab" data-tab="manage">Manage Proxies</div>
+    <div class="tab" data-tab="edit">Edit My Proxy</div>
   </div>
 </header>
 
 <main>
 
-<!-- ═══════════════════════════ CREATE TAB ═══════════════════════════ -->
+<!-- ══════════════════════════ CREATE TAB ══════════════════════════ -->
 <div class="tab-page active" id="tab-create">
 
-  <!-- 1. Upstream -->
+  <!-- Quick presets -->
+  <div class="divider"><span class="divider-label">Quick Presets</span></div>
+  <div class="card">
+    <div class="card-label">Start From a Preset</div>
+    <div class="card-sublabel">Presets set sensible defaults — you can adjust anything afterwards.</div>
+    <div class="preset-bar">
+      <button class="preset-btn" onclick="applyPreset('passthrough')">🔁 Passthrough (no changes)</button>
+      <button class="preset-btn" onclick="applyPreset('artwork')">🎨 Artwork Override</button>
+      <button class="preset-btn" onclick="applyPreset('clean')">🧹 Clean Streams (HTTPS + no P2P)</button>
+      <button class="preset-btn" onclick="applyPreset('lite')">⚡ Lite (meta + streams only)</button>
+      <button class="preset-btn" onclick="applyPreset('cached')">💾 Heavily Cached</button>
+    </div>
+  </div>
+
+  <!-- Step 1: Upstream -->
   <div class="divider"><span class="divider-label">Step 1 — Upstream Addon</span></div>
   <div class="card">
     <div class="card-label">Source Addon</div>
     <div class="field">
-      <label>Manifest URL <span class="hint">— paste the full manifest.json URL of the original addon</span></label>
+      <label>Manifest URL <span class="hint">— full manifest.json URL of the original addon</span></label>
       <div style="display:flex;gap:8px;">
         <input type="url" id="manifestUrl" placeholder="https://addon.example.com/manifest.json" oninput="onManifestUrlChange()" style="flex:1" />
         <button class="btn-sm" onclick="previewManifest()">Validate</button>
       </div>
     </div>
-
     <div id="preview-card">
-      <div class="preview-inner" id="preview-inner">
-        <div class="preview-loading">Validating upstream addon…</div>
-      </div>
+      <div class="preview-inner" id="preview-inner"><div class="preview-loading">Validating…</div></div>
     </div>
   </div>
 
-  <!-- 2. Image overrides -->
+  <!-- Step 2: Artwork -->
   <div class="divider"><span class="divider-label">Step 2 — Artwork Overrides</span></div>
   <div class="card">
     <div class="card-label">Image URL Templates</div>
-    <div class="card-sublabel">
-      Use <code>{id}</code>, <code>{type}</code>, <code>{season}</code>, <code>{episode}</code> as placeholders.
-      Leave blank to keep the original image. Click a chip to insert the variable at the cursor.
-    </div>
-
-    <div class="url-grid" style="margin-bottom:14px">
+    <div class="card-sublabel">Use <code>{id}</code>, <code>{type}</code>, <code>{season}</code>, <code>{episode}</code> as placeholders. Leave blank to keep originals.</div>
+    <div class="g2" style="margin-bottom:12px">
       <div class="field">
-        <label>Poster <span class="hint">— 1:0.675 or 1:1, &lt;100 KB</span></label>
-        <input type="text" id="posterUrl" placeholder="https://api.posterium.com/poster/{id}" />
-        <div class="chips">
-          <span class="chip" onclick="insertVar('posterUrl','{id}')">{id}</span>
-          <span class="chip" onclick="insertVar('posterUrl','{type}')">{type}</span>
-        </div>
+        <label>Poster <span class="hint">1:0.675 or 1:1, &lt;100KB</span></label>
+        <input type="text" id="posterUrl" placeholder="https://api.rpdb.xyz/poster/{id}" />
+        <div class="chips"><span class="chip" onclick="insertVar('posterUrl','{id}')">{id}</span><span class="chip" onclick="insertVar('posterUrl','{type}')">{type}</span></div>
       </div>
       <div class="field">
-        <label>Logo <span class="hint">— PNG, monochrome, 256×256</span></label>
-        <input type="text" id="logoUrl" placeholder="https://api.posterium.com/logo/{id}" />
-        <div class="chips">
-          <span class="chip" onclick="insertVar('logoUrl','{id}')">{id}</span>
-          <span class="chip" onclick="insertVar('logoUrl','{type}')">{type}</span>
-        </div>
+        <label>Logo <span class="hint">PNG monochrome 256×256</span></label>
+        <input type="text" id="logoUrl" placeholder="https://example.com/logo/{id}" />
+        <div class="chips"><span class="chip" onclick="insertVar('logoUrl','{id}')">{id}</span></div>
       </div>
       <div class="field">
-        <label>Background <span class="hint">— PNG, ≥1024×786, &lt;500 KB</span></label>
-        <input type="text" id="backgroundUrl" placeholder="https://api.posterium.com/bg/{id}" />
-        <div class="chips">
-          <span class="chip" onclick="insertVar('backgroundUrl','{id}')">{id}</span>
-          <span class="chip" onclick="insertVar('backgroundUrl','{type}')">{type}</span>
-        </div>
+        <label>Background <span class="hint">PNG ≥1024×786, &lt;500KB</span></label>
+        <input type="text" id="backgroundUrl" placeholder="https://example.com/bg/{id}" />
+        <div class="chips"><span class="chip" onclick="insertVar('backgroundUrl','{id}')">{id}</span></div>
       </div>
       <div class="field">
         <label>Banner</label>
-        <input type="text" id="bannerUrl" placeholder="https://api.posterium.com/banner/{id}" />
-        <div class="chips">
-          <span class="chip" onclick="insertVar('bannerUrl','{id}')">{id}</span>
-          <span class="chip" onclick="insertVar('bannerUrl','{type}')">{type}</span>
-        </div>
+        <input type="text" id="bannerUrl" placeholder="https://example.com/banner/{id}" />
+        <div class="chips"><span class="chip" onclick="insertVar('bannerUrl','{id}')">{id}</span></div>
       </div>
     </div>
-
-    <div class="url-grid">
+    <div class="g2">
       <div class="field">
-        <label>Episode Thumbnail <span class="hint">— for series/channel video objects, &lt;5 KB</span></label>
-        <input type="text" id="thumbnailUrl" placeholder="https://api.posterium.com/thumb/{id}/{season}/{episode}" />
+        <label>Episode Thumbnail <span class="hint">&lt;5KB</span></label>
+        <input type="text" id="thumbnailUrl" placeholder="https://example.com/thumb/{id}/{season}/{episode}" />
         <div class="chips">
           <span class="chip" onclick="insertVar('thumbnailUrl','{id}')">{id}</span>
-          <span class="chip" onclick="insertVar('thumbnailUrl','{type}')">{type}</span>
           <span class="chip" onclick="insertVar('thumbnailUrl','{season}')">{season}</span>
           <span class="chip" onclick="insertVar('thumbnailUrl','{episode}')">{episode}</span>
         </div>
       </div>
       <div class="field">
-        <label>Poster Shape <span class="hint">— override aspect ratio hint</span></label>
+        <label>Poster Shape</label>
         <select id="posterShape">
           <option value="">Keep original</option>
           <option value="poster">poster — 1:0.675 (IMDb style)</option>
@@ -468,152 +240,176 @@
     </div>
   </div>
 
-  <!-- 3. Text overrides -->
-  <div class="divider"><span class="divider-label">Step 3 — Text Overrides</span></div>
+  <!-- Step 3: Text -->
+  <div class="divider"><span class="divider-label">Step 3 — Name &amp; Description</span></div>
   <div class="card">
-    <div class="card-label">Name &amp; Description</div>
-    <div class="url-grid" style="margin-bottom:14px">
-      <div class="field">
-        <label>Name prefix <span class="hint">— prepended to addon name</span></label>
-        <input type="text" id="namePrefix" placeholder="[HD] " />
-      </div>
-      <div class="field">
-        <label>Name suffix <span class="hint">— appended to addon name</span></label>
-        <input type="text" id="nameSuffix" placeholder=" (Remastered)" />
-      </div>
+    <div class="card-label">Text Overrides</div>
+    <div class="g2" style="margin-bottom:12px">
+      <div class="field"><label>Name prefix</label><input type="text" id="namePrefix" placeholder="[HD] " /></div>
+      <div class="field"><label>Name suffix</label><input type="text" id="nameSuffix" placeholder=" (Remastered)" /></div>
     </div>
-    <div class="url-grid">
-      <div class="field">
-        <label>Description prefix</label>
-        <input type="text" id="descriptionPrefix" placeholder="⚡ " />
-      </div>
-      <div class="field">
-        <label>Description suffix</label>
-        <input type="text" id="descriptionSuffix" placeholder=" — via PosteriumProxy" />
-      </div>
+    <div class="g2">
+      <div class="field"><label>Description prefix</label><input type="text" id="descriptionPrefix" placeholder="⚡ " /></div>
+      <div class="field"><label>Description suffix</label><input type="text" id="descriptionSuffix" placeholder=" — via PosteriumProxy" /></div>
     </div>
   </div>
 
-  <!-- 4. Feature toggles -->
-  <div class="divider"><span class="divider-label">Step 4 — Resources &amp; Features</span></div>
+  <!-- Step 4: Resources & Features -->
+  <div class="divider"><span class="divider-label">Step 4 — Resources &amp; Feature Toggles</span></div>
   <div class="card">
     <div class="card-label">Resource Toggles</div>
-    <div class="card-sublabel">Disable resources your use-case doesn't need. Disabling a resource removes it from the manifest and returns empty responses.</div>
     <div class="check-grid">
-      <label class="check-item checked" id="chk-catalog">
-        <input type="checkbox" id="enableCatalog" checked />
-        <div class="checkmark"><svg width="9" height="7" viewBox="0 0 9 7"><path d="M1 3.5l2.5 2.5 4.5-5" stroke="#000" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" fill="none"/></svg></div>
+      <label class="check-item checked" data-id="chk-catalog">
+        <input type="checkbox" id="enableCatalog" checked /><div class="checkmark"><svg width="9" height="7" viewBox="0 0 9 7"><path d="M1 3.5l2.5 2.5 4.5-5" stroke="#000" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" fill="none"/></svg></div>
         <div><div class="check-text">Catalog</div><div class="check-desc">Browse &amp; discover</div></div>
       </label>
-      <label class="check-item checked" id="chk-meta">
-        <input type="checkbox" id="enableMeta" checked />
-        <div class="checkmark"><svg width="9" height="7" viewBox="0 0 9 7"><path d="M1 3.5l2.5 2.5 4.5-5" stroke="#000" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" fill="none"/></svg></div>
+      <label class="check-item checked" data-id="chk-meta">
+        <input type="checkbox" id="enableMeta" checked /><div class="checkmark"><svg width="9" height="7" viewBox="0 0 9 7"><path d="M1 3.5l2.5 2.5 4.5-5" stroke="#000" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" fill="none"/></svg></div>
         <div><div class="check-text">Metadata</div><div class="check-desc">Detail pages</div></div>
       </label>
-      <label class="check-item checked" id="chk-streams">
-        <input type="checkbox" id="enableStreams" checked />
-        <div class="checkmark"><svg width="9" height="7" viewBox="0 0 9 7"><path d="M1 3.5l2.5 2.5 4.5-5" stroke="#000" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" fill="none"/></svg></div>
+      <label class="check-item checked" data-id="chk-streams">
+        <input type="checkbox" id="enableStreams" checked /><div class="checkmark"><svg width="9" height="7" viewBox="0 0 9 7"><path d="M1 3.5l2.5 2.5 4.5-5" stroke="#000" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" fill="none"/></svg></div>
         <div><div class="check-text">Streams</div><div class="check-desc">Video links</div></div>
       </label>
-      <label class="check-item checked" id="chk-subtitles">
-        <input type="checkbox" id="enableSubtitles" checked />
-        <div class="checkmark"><svg width="9" height="7" viewBox="0 0 9 7"><path d="M1 3.5l2.5 2.5 4.5-5" stroke="#000" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" fill="none"/></svg></div>
+      <label class="check-item checked" data-id="chk-subs">
+        <input type="checkbox" id="enableSubtitles" checked /><div class="checkmark"><svg width="9" height="7" viewBox="0 0 9 7"><path d="M1 3.5l2.5 2.5 4.5-5" stroke="#000" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" fill="none"/></svg></div>
         <div><div class="check-text">Subtitles</div><div class="check-desc">Subtitle tracks</div></div>
       </label>
-      <label class="check-item checked" id="chk-search">
-        <input type="checkbox" id="enableSearch" checked />
-        <div class="checkmark"><svg width="9" height="7" viewBox="0 0 9 7"><path d="M1 3.5l2.5 2.5 4.5-5" stroke="#000" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" fill="none"/></svg></div>
-        <div><div class="check-text">Search</div><div class="check-desc">In-catalog search</div></div>
+      <label class="check-item checked" data-id="chk-search">
+        <input type="checkbox" id="enableSearch" checked /><div class="checkmark"><svg width="9" height="7" viewBox="0 0 9 7"><path d="M1 3.5l2.5 2.5 4.5-5" stroke="#000" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" fill="none"/></svg></div>
+        <div><div class="check-text">Search</div><div class="check-desc">Catalog search</div></div>
       </label>
     </div>
   </div>
 
- <div class="divider"><span class="divider-label">Step 5 — Content Filters &amp; Optimizations</span></div>
+  <!-- Step 5: Content Filters -->
+  <div class="divider"><span class="divider-label">Step 5 — Content Filters</span></div>
   <div class="card">
     <div class="card-label">Content Type Filter</div>
-    <div class="card-sublabel">Select which content types to expose. Leave all unselected to pass all types through.</div>
+    <div class="card-sublabel">Leave all unselected to pass all types through.</div>
     <div class="type-grid" id="typeGrid">
       <div class="type-pill" data-type="movie"  onclick="toggleType(this)">Movie</div>
       <div class="type-pill" data-type="series" onclick="toggleType(this)">Series</div>
       <div class="type-pill" data-type="channel" onclick="toggleType(this)">Channel</div>
       <div class="type-pill" data-type="tv"     onclick="toggleType(this)">TV</div>
     </div>
-    <div style="font-size:11px;color:var(--muted);margin-top:8px;">
-      Upstream-unavailable types are automatically excluded even if selected.
-    </div>
+    <div style="font-size:11px;color:var(--muted);margin-top:8px;">Upstream-unavailable types are excluded automatically.</div>
   </div>
 
   <div class="card">
-    <div class="card-label">Advanced Optimizations</div>
-    <div class="check-grid">
-      <label class="check-item" id="chk-offline" data-color="green">
-        <input type="checkbox" id="offlineCache" />
-        <div class="checkmark"><svg width="9" height="7" viewBox="0 0 9 7"><path d="M1 3.5l2.5 2.5 4.5-5" stroke="#000" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" fill="none"/></svg></div>
-        <div><div class="check-text">Offline Cache</div><div class="check-desc">Show cached content if upstream fails</div></div>
-      </label>
-      <label class="check-item" id="chk-notrailers" data-color="red">
-        <input type="checkbox" id="removeTrailers" />
-        <div class="checkmark"><svg width="9" height="7" viewBox="0 0 9 7"><path d="M1 3.5l2.5 2.5 4.5-5" stroke="#000" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" fill="none"/></svg></div>
-        <div><div class="check-text">Remove Trailers</div><div class="check-desc">Strip YouTube trailers from metadata</div></div>
-      </label>
-      <label class="check-item" id="chk-noartwork" data-color="red">
-        <input type="checkbox" id="removeHeavyArtwork" />
-        <div class="checkmark"><svg width="9" height="7" viewBox="0 0 9 7"><path d="M1 3.5l2.5 2.5 4.5-5" stroke="#000" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" fill="none"/></svg></div>
-        <div><div class="check-text">Strip Heavy Artwork</div><div class="check-desc">Remove backgrounds and banners to save data</div></div>
-      </label>
+    <div class="card-label">ID Prefix Filter <span style="font-size:11px;color:var(--silver);font-family:'DM Sans',sans-serif;font-weight:300;letter-spacing:0;text-transform:none">— only proxy requests matching these prefixes</span></div>
+    <div class="card-sublabel">Comma-separated prefixes, e.g. <code>tt</code>, <code>yt_id:</code>. Leave blank for all IDs.</div>
+    <div class="field"><label>ID Prefixes <span class="hint">comma-separated</span></label><input type="text" id="idPrefixFilter" placeholder="tt, yt_id:" /></div>
+    <div class="chips">
+      <span class="chip" onclick="addPfx('tt')">IMDb (tt)</span>
+      <span class="chip" onclick="addPfx('yt_id:')">YouTube</span>
+      <span class="chip" onclick="addPfx('kitsu:')">Kitsu (anime)</span>
+      <span class="chip" onclick="addPfx('tmdb:')">TMDB</span>
     </div>
   </div>
 
   <div class="card">
     <div class="card-label">Stream Filters</div>
     <div class="check-grid">
-      <label class="check-item" id="chk-https" data-color="green">
-        <input type="checkbox" id="forceHttpsStreams" />
-        <div class="checkmark"><svg width="9" height="7" viewBox="0 0 9 7"><path d="M1 3.5l2.5 2.5 4.5-5" stroke="#000" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" fill="none"/></svg></div>
-        <div><div class="check-text">Force HTTPS</div><div class="check-desc">Rewrite http:// stream URLs to https://</div></div>
+      <label class="check-item" data-color="gr">
+        <input type="checkbox" id="forceHttpsStreams" /><div class="checkmark"><svg width="9" height="7" viewBox="0 0 9 7"><path d="M1 3.5l2.5 2.5 4.5-5" stroke="#000" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" fill="none"/></svg></div>
+        <div><div class="check-text">Force HTTPS</div><div class="check-desc">Rewrite http:// URLs</div></div>
       </label>
-      <label class="check-item" id="chk-torrents" data-color="red">
-        <input type="checkbox" id="stripTorrents" />
-        <div class="checkmark"><svg width="9" height="7" viewBox="0 0 9 7"><path d="M1 3.5l2.5 2.5 4.5-5" stroke="#000" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" fill="none"/></svg></div>
-        <div><div class="check-text">Strip Torrents</div><div class="check-desc">Remove infoHash-based P2P streams</div></div>
+      <label class="check-item" data-color="rd">
+        <input type="checkbox" id="stripTorrents" /><div class="checkmark"><svg width="9" height="7" viewBox="0 0 9 7"><path d="M1 3.5l2.5 2.5 4.5-5" stroke="#000" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" fill="none"/></svg></div>
+        <div><div class="check-text">Strip Torrents</div><div class="check-desc">Remove infoHash streams</div></div>
       </label>
-      <label class="check-item" id="chk-magnets" data-color="red">
-        <input type="checkbox" id="stripMagnetStreams" />
-        <div class="checkmark"><svg width="9" height="7" viewBox="0 0 9 7"><path d="M1 3.5l2.5 2.5 4.5-5" stroke="#000" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" fill="none"/></svg></div>
-        <div><div class="check-text">Strip Magnets</div><div class="check-desc">Remove magnet: link streams</div></div>
+      <label class="check-item" data-color="rd">
+        <input type="checkbox" id="stripMagnetStreams" /><div class="checkmark"><svg width="9" height="7" viewBox="0 0 9 7"><path d="M1 3.5l2.5 2.5 4.5-5" stroke="#000" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" fill="none"/></svg></div>
+        <div><div class="check-text">Strip Magnets</div><div class="check-desc">Remove magnet: URLs</div></div>
+      </label>
+      <label class="check-item" data-color="gr">
+        <input type="checkbox" id="removeDuplicateStreams" /><div class="checkmark"><svg width="9" height="7" viewBox="0 0 9 7"><path d="M1 3.5l2.5 2.5 4.5-5" stroke="#000" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" fill="none"/></svg></div>
+        <div><div class="check-text">Deduplicate</div><div class="check-desc">Remove duplicate URLs</div></div>
       </label>
     </div>
   </div>
 
   <div class="card">
-    <div class="card-label">Manifest Flags</div>
+    <div class="card-label">Manifest Flags &amp; Metadata</div>
     <div class="check-grid">
-      <label class="check-item" id="chk-adult" data-color="red">
-        <input type="checkbox" id="stripAdultFlag" />
-        <div class="checkmark"><svg width="9" height="7" viewBox="0 0 9 7"><path d="M1 3.5l2.5 2.5 4.5-5" stroke="#000" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" fill="none"/></svg></div>
-        <div><div class="check-text">Strip Adult Flag</div><div class="check-desc">Remove behaviorHints.adult warning</div></div>
+      <label class="check-item" data-color="rd">
+        <input type="checkbox" id="stripAdultFlag" /><div class="checkmark"><svg width="9" height="7" viewBox="0 0 9 7"><path d="M1 3.5l2.5 2.5 4.5-5" stroke="#000" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" fill="none"/></svg></div>
+        <div><div class="check-text">Strip Adult Flag</div><div class="check-desc">Remove adult warning</div></div>
       </label>
-      <label class="check-item" id="chk-p2p" data-color="red">
-        <input type="checkbox" id="stripP2PFlag" />
-        <div class="checkmark"><svg width="9" height="7" viewBox="0 0 9 7"><path d="M1 3.5l2.5 2.5 4.5-5" stroke="#000" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" fill="none"/></svg></div>
-        <div><div class="check-text">Strip P2P Flag</div><div class="check-desc">Remove behaviorHints.p2p warning</div></div>
+      <label class="check-item" data-color="rd">
+        <input type="checkbox" id="stripP2PFlag" /><div class="checkmark"><svg width="9" height="7" viewBox="0 0 9 7"><path d="M1 3.5l2.5 2.5 4.5-5" stroke="#000" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" fill="none"/></svg></div>
+        <div><div class="check-text">Strip P2P Flag</div><div class="check-desc">Remove P2P warning</div></div>
+      </label>
+      <label class="check-item" data-color="gr">
+        <input type="checkbox" id="offlineCache" /><div class="checkmark"><svg width="9" height="7" viewBox="0 0 9 7"><path d="M1 3.5l2.5 2.5 4.5-5" stroke="#000" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" fill="none"/></svg></div>
+        <div><div class="check-text">Offline Cache</div><div class="check-desc">Serve stale if upstream fails</div></div>
+      </label>
+      <label class="check-item" data-color="rd">
+        <input type="checkbox" id="removeTrailers" /><div class="checkmark"><svg width="9" height="7" viewBox="0 0 9 7"><path d="M1 3.5l2.5 2.5 4.5-5" stroke="#000" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" fill="none"/></svg></div>
+        <div><div class="check-text">Remove Trailers</div><div class="check-desc">Strip YouTube trailers</div></div>
+      </label>
+      <label class="check-item" data-color="rd">
+        <input type="checkbox" id="removeHeavyArtwork" /><div class="checkmark"><svg width="9" height="7" viewBox="0 0 9 7"><path d="M1 3.5l2.5 2.5 4.5-5" stroke="#000" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" fill="none"/></svg></div>
+        <div><div class="check-text">Strip Heavy Art</div><div class="check-desc">Remove bg &amp; banners</div></div>
       </label>
     </div>
   </div>
 
-  <!-- 6. Subtitle language filter -->
-  <div class="divider"><span class="divider-label">Step 6 — Subtitle Languages</span></div>
+  <!-- Step 6: Stream Transforms (NEW) -->
+  <div class="divider"><span class="divider-label">Step 6 — Stream Transforms</span></div>
+  <div class="card">
+    <div class="card-label">Stream Sorting &amp; Limits</div>
+    <div class="g3">
+      <div class="field">
+        <label>Sort streams by</label>
+        <select id="streamSortBy">
+          <option value="none">Keep original order</option>
+          <option value="quality_desc">Quality (best first)</option>
+          <option value="name_asc">Name A→Z</option>
+        </select>
+      </div>
+      <div class="field">
+        <label>Max streams <span class="hint">0 = unlimited</span></label>
+        <input type="number" id="maxStreams" value="0" min="0" max="200" />
+      </div>
+      <div class="field">
+        <label>Stream name prefix</label>
+        <input type="text" id="streamNamePrefix" placeholder="[HD] " />
+      </div>
+    </div>
+    <div class="g3" style="margin-top:12px">
+      <div class="field">
+        <label>Stream name suffix</label>
+        <input type="text" id="streamNameSuffix" placeholder=" ★" />
+      </div>
+    </div>
+  </div>
+
+  <!-- Step 7: Metadata Filters (NEW) -->
+  <div class="divider"><span class="divider-label">Step 7 — Metadata Filters</span></div>
+  <div class="card">
+    <div class="card-label">Catalog Quality Filtering</div>
+    <div class="card-sublabel">Filter out low-quality items from catalog responses before sending to Stremio.</div>
+    <div class="g2">
+      <div class="field">
+        <label>Minimum IMDb rating <span class="hint">0 = no filter</span></label>
+        <input type="number" id="minImdbRating" value="0" min="0" max="10" step="0.1" placeholder="e.g. 6.0" />
+      </div>
+      <div class="field">
+        <label>Allowed genres <span class="hint">comma-separated, leave blank for all</span></label>
+        <input type="text" id="allowedGenres" placeholder="Action, Drama, Comedy" />
+      </div>
+    </div>
+  </div>
+
+  <!-- Step 8: Subtitles -->
+  <div class="divider"><span class="divider-label">Step 8 — Subtitle Languages</span></div>
   <div class="card">
     <div class="card-label">Subtitle Language Whitelist</div>
-    <div class="card-sublabel">
-      Enter ISO 639-2 language codes separated by commas. Leave blank to pass all languages.
-      E.g. <code>eng, spa, fra, deu, jpn</code>
-    </div>
-    <div class="field">
-      <label>Languages <span class="hint">— comma-separated ISO 639-2 codes</span></label>
-      <input type="text" id="subtitleLanguages" placeholder="eng, spa, fra" />
-    </div>
-    <div class="chips" style="margin-top:8px">
+    <div class="card-sublabel">ISO 639-2 codes comma-separated. Blank = pass all.</div>
+    <div class="field"><label>Languages</label><input type="text" id="subtitleLanguages" placeholder="eng, spa, fra" /></div>
+    <div class="chips">
       <span class="chip" onclick="addLang('eng')">English</span>
       <span class="chip" onclick="addLang('spa')">Spanish</span>
       <span class="chip" onclick="addLang('fra')">French</span>
@@ -629,395 +425,564 @@
     </div>
   </div>
 
-  <!-- 7. Cache TTL -->
-  <div class="divider"><span class="divider-label">Step 7 — Cache (optional)</span></div>
+  <!-- Step 9: Cache -->
+  <div class="divider"><span class="divider-label">Step 9 — Edge Cache TTLs (optional)</span></div>
   <div class="card">
-    <div class="card-label">Response Cache TTL</div>
+    <div class="card-label">Cache Durations</div>
     <div class="card-sublabel">
-      Override <code>Cache-Control: max-age</code> per resource type. Set 0 to use no custom caching (upstream headers pass through).
+      Responses are always served fresh to Stremio (<code>no-store</code>) but cached internally for speed. Set 0 to use smart defaults (catalog 30m, meta 24h, streams 5m, subtitles 1h).
     </div>
-    <div class="grid-4">
-      <div class="field">
-        <label>Catalog <span class="hint">seconds</span></label>
-        <input type="number" id="catalogCacheTtl" value="0" min="0" max="86400" />
-      </div>
-      <div class="field">
-        <label>Meta <span class="hint">seconds</span></label>
-        <input type="number" id="metaCacheTtl" value="0" min="0" max="86400" />
-      </div>
-      <div class="field">
-        <label>Streams <span class="hint">seconds</span></label>
-        <input type="number" id="streamCacheTtl" value="0" min="0" max="86400" />
-      </div>
-      <div class="field">
-        <label>Subtitles <span class="hint">seconds</span></label>
-        <input type="number" id="subtitleCacheTtl" value="0" min="0" max="86400" />
-      </div>
-    </div>
-    <div style="font-size:11px;color:var(--muted);margin-top:8px;">
-      Recommended: Catalog 3600 (1h) · Meta 86400 (24h) · Streams 300 (5min) · Subtitles 3600 (1h)
+    <div class="g4">
+      <div class="field"><label>Catalog <span class="hint">secs</span></label><input type="number" id="catalogCacheTtl" value="0" min="0" max="86400" /></div>
+      <div class="field"><label>Meta <span class="hint">secs</span></label><input type="number" id="metaCacheTtl" value="0" min="0" max="86400" /></div>
+      <div class="field"><label>Streams <span class="hint">secs</span></label><input type="number" id="streamCacheTtl" value="0" min="0" max="86400" /></div>
+      <div class="field"><label>Subtitles <span class="hint">secs</span></label><input type="number" id="subtitleCacheTtl" value="0" min="0" max="86400" /></div>
     </div>
   </div>
 
-  <!-- Submit -->
-  <button class="btn-primary" id="createBtn" onclick="createProxy()">
-    Generate Proxy Addon
-  </button>
+  <!-- Step 10: Password -->
+  <div class="divider"><span class="divider-label">Step 10 — Set Your Proxy Password</span></div>
+  <div class="card">
+    <div class="card-label">Proxy Password</div>
+    <div class="card-sublabel">Used to edit or delete your proxy later at <code>/{id}/configure</code>. Choose something you'll remember. Minimum 4 characters.</div>
+    <div class="field">
+      <label>Password <span class="hint">— required</span></label>
+      <div class="pw-wrap">
+        <input type="password" id="proxyPassword" placeholder="Set a password for your proxy" autocomplete="new-password" />
+        <button class="pw-toggle" onclick="togglePw('proxyPassword')" type="button">Show</button>
+      </div>
+    </div>
+    <div class="field">
+      <label>Confirm Password</label>
+      <div class="pw-wrap">
+        <input type="password" id="proxyPasswordConfirm" placeholder="Repeat your password" autocomplete="new-password" />
+        <button class="pw-toggle" onclick="togglePw('proxyPasswordConfirm')" type="button">Show</button>
+      </div>
+    </div>
+  </div>
 
+  <button class="btn-primary" id="createBtn" onclick="createProxy()">Generate Proxy Addon</button>
   <div id="error"></div>
-
   <div id="result">
     <div class="result-card">
       <div class="result-title">Proxy Addon Created</div>
       <div class="result-row">
         <div class="result-label">Manifest URL — paste into Stremio</div>
-        <div class="result-url">
-          <span id="resManifest" style="flex:1;word-break:break-all"></span>
-          <button class="copy-btn" onclick="copyTo('resManifest',this)">Copy</button>
-        </div>
+        <div class="result-url"><span id="resManifest" style="flex:1;word-break:break-all"></span><button class="copy-btn" onclick="copyTo('resManifest',this)">Copy</button></div>
       </div>
       <div class="result-row">
         <div class="result-label">Stremio Deep Link</div>
-        <div class="result-url">
-          <span id="resStremio" style="flex:1;word-break:break-all"></span>
-          <button class="copy-btn" onclick="copyTo('resStremio',this)">Copy</button>
-        </div>
+        <div class="result-url"><span id="resStremio" style="flex:1;word-break:break-all"></span><button class="copy-btn" onclick="copyTo('resStremio',this)">Copy</button></div>
+      </div>
+      <div class="result-row">
+        <div class="result-label">Configure URL (edit later)</div>
+        <div class="result-url"><span id="resConfigure" style="flex:1;word-break:break-all"></span><button class="copy-btn" onclick="copyTo('resConfigure',this)">Copy</button></div>
       </div>
       <a id="installLink" href="#" class="install-btn" target="_blank">
-        <svg width="14" height="14" viewBox="0 0 14 14" fill="none">
-          <path d="M7 1v9M2 7l5 5 5-5M1 13h12" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
-        </svg>
+        <svg width="13" height="13" viewBox="0 0 14 14" fill="none"><path d="M7 1v9M2 7l5 5 5-5M1 13h12" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
         Install in Stremio
       </a>
+      <div class="save-note">
+        🔐 <strong>Save these details!</strong> You'll need your proxy ID and password to edit or delete this proxy at the Configure URL above.
+      </div>
     </div>
   </div>
 
 </div><!-- /tab-create -->
 
-<!-- ═══════════════════════════ MANAGE TAB ═══════════════════════════ -->
-<div class="tab-page" id="tab-manage">
-  <div class="divider"><span class="divider-label">Your Proxies</span></div>
-  <div id="proxy-list-wrap">
-    <div class="empty-list">Loading…</div>
-  </div>
-</div>
+<!-- ══════════════════════════ EDIT TAB ══════════════════════════ -->
+<div class="tab-page" id="tab-edit">
 
+  <div class="divider"><span class="divider-label">Load Your Proxy</span></div>
+
+  <div class="edit-banner" id="editBanner"></div>
+
+  <div class="card" id="loadBox">
+    <div class="card-label">Proxy Credentials</div>
+    <div class="card-sublabel">Enter your proxy ID and password to load your configuration for editing.</div>
+    <div class="g2">
+      <div class="field">
+        <label>Proxy ID</label>
+        <input type="text" id="editProxyId" placeholder="xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx" />
+      </div>
+      <div class="field">
+        <label>Password</label>
+        <div class="pw-wrap">
+          <input type="password" id="editPassword" placeholder="Your proxy password" />
+          <button class="pw-toggle" onclick="togglePw('editPassword')" type="button">Show</button>
+        </div>
+      </div>
+    </div>
+    <button class="btn-sm" style="margin-top:8px;width:100%" onclick="loadProxyForEdit()">Load Proxy Config</button>
+    <div id="loadError" style="display:none;margin-top:10px;color:#e74c3c;font-size:12px"></div>
+  </div>
+
+  <!-- Edit form (hidden until config loaded) -->
+  <div id="editForm" style="display:none">
+    <div class="divider"><span class="divider-label">Upstream Addon</span></div>
+    <div class="card">
+      <div class="card-label">Change Upstream</div>
+      <div class="field">
+        <label>Manifest URL</label>
+        <div style="display:flex;gap:8px">
+          <input type="url" id="editManifestUrl" placeholder="https://addon.example.com/manifest.json" oninput="onEditManifestChange()" style="flex:1" />
+          <button class="btn-sm" onclick="previewEditManifest()">Validate</button>
+        </div>
+      </div>
+      <div id="preview-card2"><div class="preview-inner" id="preview-inner2"></div></div>
+    </div>
+
+    <div class="divider"><span class="divider-label">Artwork</span></div>
+    <div class="card">
+      <div class="g2">
+        <div class="field"><label>Poster URL</label><input type="text" id="ePosterUrl" /></div>
+        <div class="field"><label>Logo URL</label><input type="text" id="eLogoUrl" /></div>
+        <div class="field"><label>Background URL</label><input type="text" id="eBackgroundUrl" /></div>
+        <div class="field"><label>Banner URL</label><input type="text" id="eBannerUrl" /></div>
+        <div class="field"><label>Thumbnail URL</label><input type="text" id="eThumbnailUrl" /></div>
+        <div class="field"><label>Poster Shape</label>
+          <select id="ePosterShape"><option value="">Keep original</option><option value="poster">poster</option><option value="square">square</option><option value="landscape">landscape</option></select>
+        </div>
+      </div>
+    </div>
+
+    <div class="divider"><span class="divider-label">Name &amp; Description</span></div>
+    <div class="card">
+      <div class="g2">
+        <div class="field"><label>Name prefix</label><input type="text" id="eNamePrefix" /></div>
+        <div class="field"><label>Name suffix</label><input type="text" id="eNameSuffix" /></div>
+        <div class="field"><label>Description prefix</label><input type="text" id="eDescPrefix" /></div>
+        <div class="field"><label>Description suffix</label><input type="text" id="eDescSuffix" /></div>
+      </div>
+    </div>
+
+    <div class="divider"><span class="divider-label">Stream Transforms</span></div>
+    <div class="card">
+      <div class="g3">
+        <div class="field"><label>Sort streams by</label>
+          <select id="eStreamSortBy"><option value="none">Keep original</option><option value="quality_desc">Quality best first</option><option value="name_asc">Name A→Z</option></select>
+        </div>
+        <div class="field"><label>Max streams (0=unlimited)</label><input type="number" id="eMaxStreams" value="0" min="0" /></div>
+        <div class="field"><label>Stream name prefix</label><input type="text" id="eStreamNamePrefix" /></div>
+      </div>
+    </div>
+
+    <div class="divider"><span class="divider-label">Metadata Filters</span></div>
+    <div class="card">
+      <div class="g2">
+        <div class="field"><label>Min IMDb rating (0=off)</label><input type="number" id="eMinImdbRating" value="0" min="0" max="10" step="0.1" /></div>
+        <div class="field"><label>Allowed genres (blank=all)</label><input type="text" id="eAllowedGenres" /></div>
+      </div>
+    </div>
+
+    <div class="divider"><span class="divider-label">Cache TTLs (seconds, 0=smart defaults)</span></div>
+    <div class="card">
+      <div class="g4">
+        <div class="field"><label>Catalog</label><input type="number" id="eCatalogTtl" value="0" min="0" /></div>
+        <div class="field"><label>Meta</label><input type="number" id="eMetaTtl" value="0" min="0" /></div>
+        <div class="field"><label>Streams</label><input type="number" id="eStreamTtl" value="0" min="0" /></div>
+        <div class="field"><label>Subtitles</label><input type="number" id="eSubtitleTtl" value="0" min="0" /></div>
+      </div>
+    </div>
+
+    <button class="btn-primary" id="updateBtn" onclick="updateProxy()">Update Proxy</button>
+    <button class="btn-sm" style="width:100%;margin-top:8px" onclick="flushProxyCache()">🗑 Flush Edge Cache</button>
+    <button class="btn-danger" onclick="deleteProxy()">Delete This Proxy</button>
+
+    <div id="error2"></div>
+    <div id="result2">
+      <div class="result-card">
+        <div class="result-title">Proxy Updated</div>
+        <div class="result-row">
+          <div class="result-label">Manifest URL</div>
+          <div class="result-url"><span id="resManifest2" style="flex:1;word-break:break-all"></span><button class="copy-btn" onclick="copyTo('resManifest2',this)">Copy</button></div>
+        </div>
+        <div class="result-row">
+          <div class="result-label">Install Link</div>
+          <div class="result-url"><span id="resStremio2" style="flex:1;word-break:break-all"></span><button class="copy-btn" onclick="copyTo('resStremio2',this)">Copy</button></div>
+        </div>
+        <a id="installLink2" href="#" class="install-btn" target="_blank">Install in Stremio</a>
+      </div>
+    </div>
+  </div>
+
+</div><!-- /tab-edit -->
 </main>
 
 <footer>
-  <p>PosteriumProxy v2 — built on <a href="https://workers.cloudflare.com" target="_blank">Cloudflare Workers</a>
-  &nbsp;·&nbsp; Part of the <a href="https://github.com" target="_blank">Posterium</a> ecosystem</p>
+  <p>PosteriumProxy v3 — built on <a href="https://workers.cloudflare.com" target="_blank">Cloudflare Workers</a>
+  &nbsp;·&nbsp; Admin: <a href="/manage">/manage</a></p>
 </footer>
 
 <script>
-// ─── Tab routing ──────────────────────────────────────────────────────────────
+// ─── State ──────────────────────────────────────────────────────────────────
+const SVG_CHK = '<svg width="9" height="7" viewBox="0 0 9 7"><path d="M1 3.5l2.5 2.5 4.5-5" stroke="#000" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" fill="none"/></svg>';
+
+// ─── Tabs ───────────────────────────────────────────────────────────────────
 document.querySelectorAll('.tab').forEach(t => {
   t.addEventListener('click', () => {
-    document.querySelectorAll('.tab').forEach(x => x.classList.remove('active'));
-    document.querySelectorAll('.tab-page').forEach(x => x.classList.remove('active'));
+    document.querySelectorAll('.tab,.tab-page').forEach(x => x.classList.remove('active'));
     t.classList.add('active');
     document.getElementById('tab-' + t.dataset.tab).classList.add('active');
-    if (t.dataset.tab === 'manage') loadProxyList();
   });
 });
 
-// ─── Checkbox logic ───────────────────────────────────────────────────────────
-const SVG_CHECK = '<svg width="9" height="7" viewBox="0 0 9 7"><path d="M1 3.5l2.5 2.5 4.5-5" stroke="#000" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" fill="none"/></svg>';
+// ─── Detect /:id/configure path ─────────────────────────────────────────────
+(function detectConfigurePath() {
+  const m = window.location.pathname.match(/^\/([0-9a-f-]{36})\/configure$/i);
+  if (m) {
+    document.querySelector('.tab[data-tab="edit"]').click();
+    document.getElementById('editProxyId').value = m[1];
+    const banner = document.getElementById('editBanner');
+    banner.textContent = `✏ Loading configuration for proxy ${m[1]}…`;
+    banner.classList.add('show');
+    // Show the load box focused
+    document.getElementById('editPassword').focus();
+  }
+})();
 
+// ─── Checkboxes ──────────────────────────────────────────────────────────────
 document.querySelectorAll('.check-item').forEach(item => {
   item.addEventListener('click', function(e) {
     if (e.target.tagName === 'INPUT') return;
     const cb = this.querySelector('input[type="checkbox"]');
     cb.checked = !cb.checked;
-    const color = this.dataset.color;
-    this.classList.remove('checked', 'checked-green', 'checked-red');
-    if (cb.checked) {
-      this.classList.add(color ? `checked-${color}` : 'checked');
-    }
+    const c = this.dataset.color;
+    this.classList.remove('checked','checked-gr','checked-rd');
+    if (cb.checked) this.classList.add(c === 'gr' ? 'checked-gr' : c === 'rd' ? 'checked-rd' : 'checked');
   });
-  // Init state
   const cb = item.querySelector('input[type="checkbox"]');
-  const color = item.dataset.color;
-  if (cb.checked) item.classList.add(color ? `checked-${color}` : 'checked');
+  const c = item.dataset.color;
+  if (cb.checked) item.classList.add(c === 'gr' ? 'checked-gr' : c === 'rd' ? 'checked-rd' : 'checked');
 });
 
-// ─── Type pills ───────────────────────────────────────────────────────────────
-function toggleType(el) {
-  el.classList.toggle('selected');
-}
-function getSelectedTypes() {
-  return [...document.querySelectorAll('.type-pill.selected')].map(el => el.dataset.type);
-}
+// ─── Types ───────────────────────────────────────────────────────────────────
+function toggleType(el) { el.classList.toggle('selected'); }
+function getSelectedTypes() { return [...document.querySelectorAll('.type-pill.selected')].map(p => p.dataset.type); }
 
-// ─── Variable chips ───────────────────────────────────────────────────────────
+// ─── Var chips ───────────────────────────────────────────────────────────────
 function insertVar(fieldId, v) {
   const el = document.getElementById(fieldId);
   const s = el.selectionStart, e = el.selectionEnd;
   el.value = el.value.slice(0,s) + v + el.value.slice(e);
-  el.setSelectionRange(s+v.length, s+v.length);
-  el.focus();
+  el.setSelectionRange(s+v.length, s+v.length); el.focus();
 }
-
-// ─── Subtitle language chips ──────────────────────────────────────────────────
 function addLang(code) {
   const el = document.getElementById('subtitleLanguages');
-  const existing = el.value.split(',').map(s => s.trim()).filter(Boolean);
-  if (!existing.includes(code)) {
-    el.value = [...existing, code].join(', ');
-  }
+  const ex = el.value.split(',').map(s=>s.trim()).filter(Boolean);
+  if (!ex.includes(code)) el.value = [...ex, code].join(', ');
+}
+function addPfx(pfx) {
+  const el = document.getElementById('idPrefixFilter');
+  const ex = el.value.split(',').map(s=>s.trim()).filter(Boolean);
+  if (!ex.includes(pfx)) el.value = [...ex, pfx].join(', ');
+}
+
+// ─── Password toggle ─────────────────────────────────────────────────────────
+function togglePw(id) {
+  const el = document.getElementById(id);
+  el.type = el.type === 'password' ? 'text' : 'password';
 }
 
 // ─── Copy ─────────────────────────────────────────────────────────────────────
 function copyTo(id, btn) {
   navigator.clipboard.writeText(document.getElementById(id).textContent).then(() => {
-    const orig = btn.textContent;
-    btn.textContent = 'Copied!';
-    btn.classList.add('copied');
+    const orig = btn.textContent; btn.textContent = 'Copied!'; btn.classList.add('copied');
     setTimeout(() => { btn.textContent = orig; btn.classList.remove('copied'); }, 2000);
   });
 }
 
+// ─── Error/result helpers ─────────────────────────────────────────────────────
+function showError(msg, detail, num='') {
+  const el = document.getElementById('error'+num);
+  el.innerHTML = `<strong>${esc(msg)}</strong>${detail ? `<br><span style="font-size:11px;opacity:.8">${esc(Array.isArray(detail)?detail.join(' · '):detail)}</span>` : ''}`;
+  el.classList.add('visible');
+  document.getElementById('result'+num)?.classList.remove('visible');
+}
+function clearError(num='') { const el = document.getElementById('error'+num); el.innerHTML=''; el.classList.remove('visible'); }
+function setLoading(id, v, msg='') {
+  const btn = document.getElementById(id);
+  btn.disabled = v;
+  btn.innerHTML = v ? `<span class="spinner"></span>${msg}` : btn.dataset.orig || btn.textContent;
+  if (!v && !btn.dataset.orig) btn.dataset.orig = btn.innerHTML;
+}
+function esc(s) { return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;'); }
+
+// ─── Presets ─────────────────────────────────────────────────────────────────
+const PRESETS = {
+  passthrough: {},
+  artwork: { removeTrailers: false },
+  clean: { forceHttpsStreams: true, stripTorrents: true, stripMagnetStreams: true, stripP2PFlag: true },
+  lite: { enableCatalog: false, enableSubtitles: false, removeHeavyArtwork: true, removeTrailers: true },
+  cached: { catalogCacheTtl: 7200, metaCacheTtl: 86400, streamCacheTtl: 600, subtitleCacheTtl: 7200, offlineCache: true },
+};
+
+function applyPreset(name) {
+  const p = PRESETS[name] || {};
+  // Reset all toggles
+  ['enableCatalog','enableMeta','enableStreams','enableSubtitles','enableSearch'].forEach(id => setCheck(id, true));
+  ['forceHttpsStreams','stripTorrents','stripMagnetStreams','stripAdultFlag','stripP2PFlag','offlineCache','removeTrailers','removeHeavyArtwork','removeDuplicateStreams'].forEach(id => setCheck(id, false));
+  if ('catalogCacheTtl' in p) document.getElementById('catalogCacheTtl').value = p.catalogCacheTtl;
+  if ('metaCacheTtl' in p) document.getElementById('metaCacheTtl').value = p.metaCacheTtl;
+  if ('streamCacheTtl' in p) document.getElementById('streamCacheTtl').value = p.streamCacheTtl;
+  if ('subtitleCacheTtl' in p) document.getElementById('subtitleCacheTtl').value = p.subtitleCacheTtl;
+  Object.entries(p).forEach(([k,v]) => { if (typeof v === 'boolean') setCheck(k, v); });
+  if (name === 'lite') { setCheck('enableCatalog', false); setCheck('enableSubtitles', false); }
+}
+
+function setCheck(id, val) {
+  const el = document.getElementById(id);
+  if (!el) return;
+  el.checked = val;
+  const item = el.closest('.check-item');
+  if (!item) return;
+  const c = item.dataset.color;
+  item.classList.remove('checked','checked-gr','checked-rd');
+  if (val) item.classList.add(c === 'gr' ? 'checked-gr' : c === 'rd' ? 'checked-rd' : 'checked');
+}
+
 // ─── Manifest preview ─────────────────────────────────────────────────────────
-let previewTimeout = null;
-let lastPreviewUrl = '';
-let previewData = null;
+let previewTimer = null, lastPreviewUrl = '';
 
 function onManifestUrlChange() {
-  clearTimeout(previewTimeout);
-  const url = document.getElementById('manifestUrl').value.trim();
-  if (!url || url === lastPreviewUrl) return;
-  previewTimeout = setTimeout(previewManifest, 900);
+  clearTimeout(previewTimer);
+  previewTimer = setTimeout(previewManifest, 800);
 }
 
 async function previewManifest() {
   const url = document.getElementById('manifestUrl').value.trim();
-  if (!url) return;
+  if (!url || url === lastPreviewUrl) return;
   lastPreviewUrl = url;
-  previewData = null;
-
-  const card = document.getElementById('preview-card');
-  const inner = document.getElementById('preview-inner');
-  card.classList.add('show');
-  inner.innerHTML = '<div class="preview-loading">⏳ Validating upstream addon…</div>';
-
+  const card = document.getElementById('preview-card'), inner = document.getElementById('preview-inner');
+  card.classList.add('show'); inner.innerHTML = '<div class="preview-loading">⏳ Validating upstream…</div>';
   try {
-    const res = await fetch('/api/preview', {
-      method: 'POST',
-      headers: {'Content-Type':'application/json'},
-      body: JSON.stringify({ upstreamManifestUrl: url })
-    });
-    const data = await res.json();
-    previewData = data;
-    renderPreview(data);
-  } catch(e) {
-    inner.innerHTML = `<div class="preview-err">⚠ Cannot reach upstream: ${e.message}</div>`;
-  }
+    const r = await fetch('/api/preview', { method:'POST', headers:{'Content-Type':'application/json'}, body: JSON.stringify({ upstreamManifestUrl: url }) });
+    renderPreview(await r.json(), inner, 'typeGrid');
+  } catch(e) { inner.innerHTML = `<div class="preview-err">⚠ ${esc(e.message)}</div>`; }
 }
 
-// Replace renderPreview(data) in the `<script>` block
-function renderPreview(data) {
-  const inner = document.getElementById('preview-inner');
-  const v = data.validation;
-  const m = data.raw || {};
+function onEditManifestChange() { clearTimeout(previewTimer); previewTimer = setTimeout(previewEditManifest, 800); }
 
+async function previewEditManifest() {
+  const url = document.getElementById('editManifestUrl').value.trim();
+  if (!url) return;
+  const card = document.getElementById('preview-card2'), inner = document.getElementById('preview-inner2');
+  card.classList.add('show'); inner.innerHTML = '<div class="preview-loading">⏳ Validating…</div>';
+  try {
+    const r = await fetch('/api/preview', { method:'POST', headers:{'Content-Type':'application/json'}, body: JSON.stringify({ upstreamManifestUrl: url }) });
+    renderPreview(await r.json(), inner, null);
+  } catch(e) { inner.innerHTML = `<div class="preview-err">⚠ ${esc(e.message)}</div>`; }
+}
+
+function renderPreview(data, inner, typeGridId) {
+  const v = data.validation, m = data.raw || {};
   let html = '';
   if (v.valid) {
-    html += `<div class="preview-name">${esc(m.name || '?')}</div>`;
-    html += `<div class="preview-id">${esc(m.id || '')} · v${esc(m.version || '?')}</div>`;
+    html += `<div class="preview-name">${esc(m.name||'?')}</div><div class="preview-id">${esc(m.id||'')} · v${esc(m.version||'?')}</div>`;
     html += '<div class="preview-tags">';
     v.resources.forEach(r => html += `<span class="preview-tag tag-resource">${r}</span>`);
-    v.types.forEach(t    => html += `<span class="preview-tag tag-type">${t}</span>`);
+    v.types.forEach(t => html += `<span class="preview-tag tag-type">${t}</span>`);
     if ((m.behaviorHints||{}).adult) html += '<span class="preview-tag tag-warn">Adult</span>';
     if ((m.behaviorHints||{}).p2p)   html += '<span class="preview-tag tag-warn">P2P</span>';
     html += '</div>';
-  } else {
-    html += `<div class="preview-name" style="color:var(--red)">Validation Failed</div>`;
-  }
-
-  if (v.errors.length) {
-    html += '<div class="preview-errors">';
-    v.errors.forEach(e => html += `<div class="preview-err">✕ ${esc(e)}</div>`);
-    html += '</div>';
-  }
-  if (v.warnings.length) {
-    html += '<div class="preview-errors">';
-    v.warnings.forEach(w => html += `<div class="preview-warn">⚠ ${esc(w)}</div>`);
-    html += '</div>';
-  }
-
+  } else { html = `<div class="preview-name" style="color:var(--red)">Validation Failed</div>`; }
+  if (v.errors.length) { html += '<div style="margin-top:6px">'; v.errors.forEach(e => html += `<div class="preview-err">✕ ${esc(e)}</div>`); html += '</div>'; }
+  if (v.warnings.length) { html += '<div style="margin-top:4px">'; v.warnings.forEach(w => html += `<div class="preview-warn">⚠ ${esc(w)}</div>`); html += '</div>'; }
   inner.innerHTML = html;
-
-  // Auto-select type pills that match this addon's types
-  if (v.valid && v.types.length) {
-    const typeGrid = document.getElementById('typeGrid');
-    const existingTypes = new Set([...document.querySelectorAll('.type-pill')].map(p => p.dataset.type));
-    v.types.forEach(t => {
-        if (!existingTypes.has(t)) {
-            typeGrid.insertAdjacentHTML('beforeend', `<div class="type-pill" data-type="${esc(t)}" onclick="toggleType(this)">${esc(t)}</div>`);
-        }
-    });
-
-    document.querySelectorAll('.type-pill').forEach(pill => {
-      const available = v.types.includes(pill.dataset.type);
-      pill.style.opacity = available ? '1' : '0.35';
-      pill.style.pointerEvents = available ? '' : 'none';
-      if (!available) pill.classList.remove('selected');
+  if (typeGridId && v.valid && v.types.length) {
+    const grid = document.getElementById(typeGridId);
+    const known = new Set([...grid.querySelectorAll('.type-pill')].map(p=>p.dataset.type));
+    v.types.forEach(t => { if (!known.has(t)) grid.insertAdjacentHTML('beforeend',`<div class="type-pill" data-type="${esc(t)}" onclick="toggleType(this)">${esc(t)}</div>`); });
+    grid.querySelectorAll('.type-pill').forEach(pill => {
+      const avail = v.types.includes(pill.dataset.type);
+      pill.style.opacity = avail ? '1' : '0.35';
+      pill.style.pointerEvents = avail ? '' : 'none';
+      if (!avail) pill.classList.remove('selected');
     });
   }
 }
 
-function esc(s) {
-  return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+// ─── Build payload from form ──────────────────────────────────────────────────
+function buildPayload() {
+  const subtitleLanguages = document.getElementById('subtitleLanguages').value
+    .split(',').map(s=>s.trim().toLowerCase()).filter(s=>/^[a-z]{2,3}$/.test(s));
+  const idPrefixFilter = document.getElementById('idPrefixFilter').value
+    .split(',').map(s=>s.trim()).filter(Boolean);
+  const allowedGenres = document.getElementById('allowedGenres').value
+    .split(',').map(s=>s.trim().toLowerCase()).filter(Boolean);
+
+  return {
+    upstreamManifestUrl:   document.getElementById('manifestUrl').value.trim(),
+    posterUrl:             document.getElementById('posterUrl').value.trim(),
+    logoUrl:               document.getElementById('logoUrl').value.trim(),
+    backgroundUrl:         document.getElementById('backgroundUrl').value.trim(),
+    bannerUrl:             document.getElementById('bannerUrl').value.trim(),
+    thumbnailUrl:          document.getElementById('thumbnailUrl').value.trim(),
+    posterShape:           document.getElementById('posterShape').value,
+    namePrefix:            document.getElementById('namePrefix').value,
+    nameSuffix:            document.getElementById('nameSuffix').value,
+    descriptionPrefix:     document.getElementById('descriptionPrefix').value,
+    descriptionSuffix:     document.getElementById('descriptionSuffix').value,
+    enableCatalog:         document.getElementById('enableCatalog').checked,
+    enableMeta:            document.getElementById('enableMeta').checked,
+    enableStreams:         document.getElementById('enableStreams').checked,
+    enableSubtitles:       document.getElementById('enableSubtitles').checked,
+    enableSearch:          document.getElementById('enableSearch').checked,
+    allowedTypes:          getSelectedTypes(),
+    forceHttpsStreams:     document.getElementById('forceHttpsStreams').checked,
+    stripTorrents:         document.getElementById('stripTorrents').checked,
+    stripMagnetStreams:    document.getElementById('stripMagnetStreams').checked,
+    stripAdultFlag:        document.getElementById('stripAdultFlag').checked,
+    stripP2PFlag:          document.getElementById('stripP2PFlag').checked,
+    offlineCache:          document.getElementById('offlineCache').checked,
+    removeTrailers:        document.getElementById('removeTrailers').checked,
+    removeHeavyArtwork:    document.getElementById('removeHeavyArtwork').checked,
+    idPrefixFilter,
+    maxStreams:            Number(document.getElementById('maxStreams').value)||0,
+    streamSortBy:          document.getElementById('streamSortBy').value,
+    streamNamePrefix:      document.getElementById('streamNamePrefix').value,
+    streamNameSuffix:      document.getElementById('streamNameSuffix').value,
+    removeDuplicateStreams: document.getElementById('removeDuplicateStreams').checked,
+    minImdbRating:         Number(document.getElementById('minImdbRating').value)||0,
+    allowedGenres,
+    subtitleLanguages,
+    catalogCacheTtl:       Number(document.getElementById('catalogCacheTtl').value)||0,
+    metaCacheTtl:          Number(document.getElementById('metaCacheTtl').value)||0,
+    streamCacheTtl:        Number(document.getElementById('streamCacheTtl').value)||0,
+    subtitleCacheTtl:      Number(document.getElementById('subtitleCacheTtl').value)||0,
+  };
 }
 
-// ─── Error/result helpers ─────────────────────────────────────────────────────
-function showError(msg, detail) {
-  const el = document.getElementById('error');
-  el.innerHTML = `<strong>${esc(msg)}</strong>${detail ? `<br><span style="font-size:11px;opacity:.8">${esc(Array.isArray(detail)?detail.join(' · '):detail)}</span>` : ''}`;
-  el.classList.add('visible');
-  document.getElementById('result').classList.remove('visible');
-}
-function clearError() {
-  const el = document.getElementById('error');
-  el.innerHTML = '';
-  el.classList.remove('visible');
-}
-function setLoading(loading) {
-  const btn = document.getElementById('createBtn');
-  btn.disabled = loading;
-  btn.innerHTML = loading
-    ? '<span class="spinner"></span> Creating proxy…'
-    : 'Generate Proxy Addon';
-}
-
-// ─── Create proxy ─────────────────────────────────────────────────────────────
+// ─── Create proxy ──────────────────────────────────────────────────────────────
 async function createProxy() {
   clearError();
-  const manifestUrl = document.getElementById('manifestUrl').value.trim();
-  if (!manifestUrl) { showError('Please enter the upstream manifest URL.'); return; }
+  const url = document.getElementById('manifestUrl').value.trim();
+  if (!url) return showError('Please enter the upstream manifest URL.');
+  const pw  = document.getElementById('proxyPassword').value;
+  const pw2 = document.getElementById('proxyPasswordConfirm').value;
+  if (!pw || pw.length < 4) return showError('Password must be at least 4 characters.');
+  if (pw !== pw2) return showError('Passwords do not match.');
 
-  // Parse subtitle languages
-  const subtitleLanguages = document.getElementById('subtitleLanguages').value
-    .split(',').map(s => s.trim().toLowerCase()).filter(s => /^[a-z]{2,3}$/.test(s));
+  const payload = { ...buildPayload(), password: pw };
+  const btn = document.getElementById('createBtn');
+  btn.dataset.orig = 'Generate Proxy Addon';
+  setLoading('createBtn', true, 'Creating proxy…');
+  try {
+    const r = await fetch('/api/create', { method:'POST', headers:{'Content-Type':'application/json'}, body: JSON.stringify(payload) });
+    const d = await r.json();
+    if (!r.ok) return showError(d.error || `Server error ${r.status}`, d.details);
+    document.getElementById('resManifest').textContent  = d.manifestUrl;
+    document.getElementById('resStremio').textContent   = d.stremioUrl;
+    document.getElementById('resConfigure').textContent = d.configureUrl;
+    document.getElementById('installLink').href = d.stremioUrl;
+    document.getElementById('result').classList.add('visible');
+    document.getElementById('result').scrollIntoView({ behavior:'smooth', block:'nearest' });
+  } catch(e) { showError('Network error — is the worker deployed?'); }
+  finally { setLoading('createBtn', false); }
+}
 
-  setLoading(true);
+// ─── Edit proxy: load ──────────────────────────────────────────────────────────
+let currentEditId = '';
+let currentEditPw = '';
+
+async function loadProxyForEdit() {
+  const id = document.getElementById('editProxyId').value.trim();
+  const pw = document.getElementById('editPassword').value;
+  const errEl = document.getElementById('loadError');
+  errEl.style.display = 'none';
+  if (!id || !pw) { errEl.textContent = 'Please enter both proxy ID and password.'; errEl.style.display='block'; return; }
+
+  const r = await fetch(`/api/config/${id}`, { headers: { Authorization: `Bearer ${pw}` } });
+  if (!r.ok) { const d = await r.json(); errEl.textContent = d.error || 'Failed to load config'; errEl.style.display='block'; return; }
+  const cfg = await r.json();
+  currentEditId = id; currentEditPw = pw;
+
+  // Fill edit form
+  document.getElementById('editManifestUrl').value    = cfg.upstreamBaseUrl || '';
+  document.getElementById('ePosterUrl').value          = cfg.posterUrl || '';
+  document.getElementById('eLogoUrl').value            = cfg.logoUrl || '';
+  document.getElementById('eBackgroundUrl').value      = cfg.backgroundUrl || '';
+  document.getElementById('eBannerUrl').value          = cfg.bannerUrl || '';
+  document.getElementById('eThumbnailUrl').value       = cfg.thumbnailUrl || '';
+  document.getElementById('ePosterShape').value        = cfg.posterShape || '';
+  document.getElementById('eNamePrefix').value         = cfg.namePrefix || '';
+  document.getElementById('eNameSuffix').value         = cfg.nameSuffix || '';
+  document.getElementById('eDescPrefix').value         = cfg.descriptionPrefix || '';
+  document.getElementById('eDescSuffix').value         = cfg.descriptionSuffix || '';
+  document.getElementById('eStreamSortBy').value       = cfg.streamSortBy || 'none';
+  document.getElementById('eMaxStreams').value         = cfg.maxStreams || 0;
+  document.getElementById('eStreamNamePrefix').value   = cfg.streamNamePrefix || '';
+  document.getElementById('eMinImdbRating').value      = cfg.minImdbRating || 0;
+  document.getElementById('eAllowedGenres').value      = (cfg.allowedGenres||[]).join(', ');
+  document.getElementById('eCatalogTtl').value         = cfg.catalogCacheTtl || 0;
+  document.getElementById('eMetaTtl').value            = cfg.metaCacheTtl || 0;
+  document.getElementById('eStreamTtl').value          = cfg.streamCacheTtl || 0;
+  document.getElementById('eSubtitleTtl').value        = cfg.subtitleCacheTtl || 0;
+
+  const banner = document.getElementById('editBanner');
+  banner.textContent = `✏ Editing proxy ${id} (cache generation v${cfg.cacheGeneration})`;
+  banner.classList.add('show');
+  document.getElementById('loadBox').style.display='none';
+  document.getElementById('editForm').style.display='block';
+}
+
+async function updateProxy() {
+  clearError('2');
+  const eu = document.getElementById('editManifestUrl').value.trim();
+  const allowedGenres = document.getElementById('eAllowedGenres').value.split(',').map(s=>s.trim().toLowerCase()).filter(Boolean);
   const payload = {
-    upstreamManifestUrl: manifestUrl,
-
-    posterUrl:     document.getElementById('posterUrl').value.trim(),
-    logoUrl:       document.getElementById('logoUrl').value.trim(),
-    backgroundUrl: document.getElementById('backgroundUrl').value.trim(),
-    bannerUrl:     document.getElementById('bannerUrl').value.trim(),
-    thumbnailUrl:  document.getElementById('thumbnailUrl').value.trim(),
-    posterShape:   document.getElementById('posterShape').value,
-
-    namePrefix:        document.getElementById('namePrefix').value,
-    nameSuffix:        document.getElementById('nameSuffix').value,
-    descriptionPrefix: document.getElementById('descriptionPrefix').value,
-    descriptionSuffix: document.getElementById('descriptionSuffix').value,
-
-    enableCatalog:   document.getElementById('enableCatalog').checked,
-    enableMeta:      document.getElementById('enableMeta').checked,
-    enableStreams:    document.getElementById('enableStreams').checked,
-    enableSubtitles: document.getElementById('enableSubtitles').checked,
-    enableSearch:    document.getElementById('enableSearch').checked,
-
-    allowedTypes: getSelectedTypes(),
-    forceHttpsStreams:  document.getElementById('forceHttpsStreams').checked,
-    stripTorrents:      document.getElementById('stripTorrents').checked,
-    stripMagnetStreams: document.getElementById('stripMagnetStreams').checked,
-    stripAdultFlag:     document.getElementById('stripAdultFlag').checked,
-    stripP2PFlag:       document.getElementById('stripP2PFlag').checked,
-
-    subtitleLanguages,
-
-    catalogCacheTtl:  Number(document.getElementById('catalogCacheTtl').value) || 0,
-    metaCacheTtl:     Number(document.getElementById('metaCacheTtl').value) || 0,
-    streamCacheTtl:   Number(document.getElementById('streamCacheTtl').value) || 0,
-    subtitleCacheTtl: Number(document.getElementById('subtitleCacheTtl').value) || 0,
-
-    // Add the new fields in createProxy() payload mappings
-    allowedTypes: getSelectedTypes(),
-    forceHttpsStreams:  document.getElementById('forceHttpsStreams').checked,
-    stripTorrents:      document.getElementById('stripTorrents').checked,
-    stripMagnetStreams: document.getElementById('stripMagnetStreams').checked,
-    stripAdultFlag:     document.getElementById('stripAdultFlag').checked,
-    stripP2PFlag:       document.getElementById('stripP2PFlag').checked,
-    offlineCache:       document.getElementById('offlineCache').checked,
-    removeTrailers:     document.getElementById('removeTrailers').checked,
-    removeHeavyArtwork: document.getElementById('removeHeavyArtwork').checked,
+    upstreamBaseUrl:      eu,
+    posterUrl:            document.getElementById('ePosterUrl').value.trim(),
+    logoUrl:              document.getElementById('eLogoUrl').value.trim(),
+    backgroundUrl:        document.getElementById('eBackgroundUrl').value.trim(),
+    bannerUrl:            document.getElementById('eBannerUrl').value.trim(),
+    thumbnailUrl:         document.getElementById('eThumbnailUrl').value.trim(),
+    posterShape:          document.getElementById('ePosterShape').value,
+    namePrefix:           document.getElementById('eNamePrefix').value,
+    nameSuffix:           document.getElementById('eNameSuffix').value,
+    descriptionPrefix:    document.getElementById('eDescPrefix').value,
+    descriptionSuffix:    document.getElementById('eDescSuffix').value,
+    streamSortBy:         document.getElementById('eStreamSortBy').value,
+    maxStreams:           Number(document.getElementById('eMaxStreams').value)||0,
+    streamNamePrefix:     document.getElementById('eStreamNamePrefix').value,
+    minImdbRating:        Number(document.getElementById('eMinImdbRating').value)||0,
+    allowedGenres,
+    catalogCacheTtl:      Number(document.getElementById('eCatalogTtl').value)||0,
+    metaCacheTtl:         Number(document.getElementById('eMetaTtl').value)||0,
+    streamCacheTtl:       Number(document.getElementById('eStreamTtl').value)||0,
+    subtitleCacheTtl:     Number(document.getElementById('eSubtitleTtl').value)||0,
   };
 
+  const btn = document.getElementById('updateBtn');
+  btn.dataset.orig = 'Update Proxy';
+  setLoading('updateBtn', true, 'Saving…');
   try {
-    const res = await fetch('/api/create', {
-      method: 'POST',
-      headers: {'Content-Type':'application/json'},
-      body: JSON.stringify(payload),
-    });
-    const data = await res.json();
-    if (!res.ok) { showError(data.error || `Server error ${res.status}`, data.details); return; }
-
-    document.getElementById('resManifest').textContent = data.manifestUrl;
-    document.getElementById('resStremio').textContent  = data.stremioUrl;
-    document.getElementById('installLink').href = data.stremioUrl;
-
-    const result = document.getElementById('result');
-    result.classList.add('visible');
-    result.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
-  } catch(e) {
-    showError('Network error — is the worker deployed?');
-  } finally {
-    setLoading(false);
-  }
+    const r = await fetch(`/api/config/${currentEditId}`, { method:'PUT', headers:{'Content-Type':'application/json','Authorization':`Bearer ${currentEditPw}`}, body: JSON.stringify(payload) });
+    const d = await r.json();
+    if (!r.ok) return showError(d.error || `Server error ${r.status}`, d.details, '2');
+    document.getElementById('resManifest2').textContent = d.manifestUrl;
+    document.getElementById('resStremio2').textContent  = d.stremioUrl;
+    document.getElementById('installLink2').href = d.stremioUrl;
+    document.getElementById('result2').classList.add('visible');
+    document.getElementById('result2').scrollIntoView({ behavior:'smooth', block:'nearest' });
+    document.getElementById('editBanner').textContent = `✅ Proxy updated & cache flushed! (cache auto-incremented)`;
+  } catch(e) { showError('Network error', '', '2'); }
+  finally { setLoading('updateBtn', false); }
 }
 
-// ─── Manage tab — proxy list ──────────────────────────────────────────────────
-async function loadProxyList() {
-  const wrap = document.getElementById('proxy-list-wrap');
-  wrap.innerHTML = '<div class="empty-list">Loading…</div>';
-  try {
-    const res = await fetch('/api/list');
-    const data = await res.json();
-    const proxies = data.proxies || [];
-    if (!proxies.length) {
-      wrap.innerHTML = '<div class="empty-list">No proxies created yet. Use the Create Proxy tab to get started.</div>';
-      return;
-    }
-    const workerHost = location.host;
-    wrap.innerHTML = '<div class="proxy-list">' + proxies.map(p => {
-      const date = new Date(p.createdAt).toLocaleDateString();
-      const displayName = p.namePrefix ? `${p.namePrefix}… (proxied)` : 'Proxied addon';
-      const manifestUrl = `${location.protocol}//${workerHost}/${p.id}/manifest.json`;
-      return `
-      <div class="proxy-item">
-        <div class="proxy-item-info">
-          <div class="proxy-item-name">${esc(displayName)}</div>
-          <div class="proxy-item-url">${esc(p.upstreamBaseUrl)}</div>
-          <div class="proxy-item-date">Created ${date}</div>
-        </div>
-        <div class="proxy-item-actions">
-          <button class="btn-sm" onclick="navigator.clipboard.writeText('${esc(manifestUrl)}').then(()=>this.textContent='Copied!').catch(()=>{});setTimeout(()=>this.textContent='Copy URL',2000)">Copy URL</button>
-          <button class="btn-del" onclick="deleteProxy('${p.id}', this)">Delete</button>
-        </div>
-      </div>`;
-    }).join('') + '</div>';
-  } catch(e) {
-    wrap.innerHTML = `<div class="empty-list" style="color:var(--red)">Error loading proxies: ${e.message}</div>`;
-  }
+async function flushProxyCache() {
+  if (!currentEditId) return;
+  const r = await fetch(`/api/flush/${currentEditId}`, { method:'POST', headers:{ Authorization:`Bearer ${currentEditPw}` } });
+  const d = await r.json();
+  if (r.ok) alert(`Cache flushed! New generation: v${d.generation}`);
+  else alert('Error: ' + (d.error||'unknown'));
 }
 
-async function deleteProxy(id, btn) {
-  if (!confirm('Delete this proxy? Stremio will stop resolving the manifest.')) return;
-  btn.disabled = true;
-  btn.textContent = 'Deleting…';
-  try {
-    await fetch(`/api/config/${id}`, { method: 'DELETE' });
-    await loadProxyList();
-  } catch(e) {
-    btn.disabled = false;
-    btn.textContent = 'Delete';
-    alert('Delete failed: ' + e.message);
-  }
+async function deleteProxy() {
+  if (!confirm(`Delete proxy ${currentEditId}? This cannot be undone.`)) return;
+  const r = await fetch(`/api/config/${currentEditId}`, { method:'DELETE', headers:{ Authorization:`Bearer ${currentEditPw}` } });
+  if (r.ok) { document.getElementById('editForm').style.display='none'; document.getElementById('loadBox').style.display='block'; alert('Proxy deleted.'); }
+  else { const d = await r.json(); alert('Error: '+(d.error||'unknown')); }
 }
 </script>
 </body>
