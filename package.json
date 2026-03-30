@@ -1,0 +1,16 @@
+{
+  "name": "posterium-proxy",
+  "version": "1.0.0",
+  "private": true,
+  "scripts": {
+    "dev": "wrangler dev",
+    "deploy": "wrangler deploy",
+    "kv:create": "wrangler kv namespace create PROXY_CONFIGS && wrangler kv namespace create PROXY_CONFIGS --preview",
+    "type-check": "tsc --noEmit"
+  },
+  "devDependencies": {
+    "@cloudflare/workers-types": "^4.20250310.0",
+    "typescript": "^5.7.3",
+    "wrangler": "^3.109.3"
+  }
+}

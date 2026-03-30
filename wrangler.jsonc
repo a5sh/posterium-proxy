@@ -1,0 +1,31 @@
+// /home/claude/posterium-proxy/wrangler.jsonc
+{
+  "name": "posterium-proxy",
+  "main": "src/index.ts",
+  "compatibility_date": "2025-03-07",
+  "compatibility_flags": ["nodejs_compat"],
+
+  "observability": {
+    "enabled": true,
+    "head_sampling_rate": 1
+  },
+
+  // Static frontend served from /public
+  "assets": {
+    "directory": "./public/",
+    "not_found_handling": "single-page-application",
+    "binding": "ASSETS"
+  },
+
+  // KV namespace for storing proxy configs
+  // Replace the id values after running:
+  //   npx wrangler kv namespace create PROXY_CONFIGS
+  //   npx wrangler kv namespace create PROXY_CONFIGS --preview
+  "kv_namespaces": [
+    {
+      "binding": "PROXY_CONFIGS",
+      "id": "REPLACE_WITH_YOUR_KV_NAMESPACE_ID",
+      "preview_id": "REPLACE_WITH_YOUR_KV_PREVIEW_NAMESPACE_ID"
+    }
+  ]
+}
