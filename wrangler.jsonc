@@ -13,7 +13,6 @@
   // Static frontend served from /public
   "assets": {
     "directory": "./public/",
-    "not_found_handling": "single-page-application",
     "binding": "ASSETS"
   },
 
@@ -24,7 +23,7 @@
   "kv_namespaces": [
     {
       "binding": "PROXY_CONFIGS",
-      "id": "4ee10667a5c548e4b75ba3e23cc82701",
+      "id": "4ee10667a5c548e4b75ba3e23cc82701"
     }
   ]
 }
