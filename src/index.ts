@@ -1,5 +1,5 @@
-// src/index.ts — PosteriumProxy v4
-// Adds: Multi-profile aggregator addon, /proxy/test static test addon,
+// src/index.ts — PosteriumProxy v4 (FIXED)
+// Adds: Multi-profile aggregator addon, /test static test profiles,
 //       unified /{uuid} routing (proxy + profileset), full stream/meta aggregation
 
 export interface Env {
@@ -42,15 +42,15 @@ interface AddonEntry {
 }
 
 interface Profile {
-  id:     string;   // 8-char alphanumeric slug, stable
+  id:     string;
   name:   string;
-  color:  string;   // hex e.g. "#e8a428"
-  icon:   string;   // emoji or letter
+  color:  string;
+  icon:   string;
   addons: AddonEntry[];
 }
 
 interface ProfileSet {
-  id:              string;  // UUID — same pool as ProxyConfig
+  id:              string;
   password:        string;
   name:            string;
   profiles:        Profile[];
@@ -251,7 +251,6 @@ function jsonToStremio(data: unknown): Response {
   });
 }
 
-// Manifest served with aggressive no-cache so profile/proxy switches are instant
 function jsonToManifest(data: unknown): Response {
   return new Response(JSON.stringify(data), {
     status: 200,
@@ -377,7 +376,6 @@ async function fetchAndCacheAddonManifest(manifestUrl: string): Promise<CachedMa
   } catch { return null; }
 }
 
-/** Parse catalog IDs of the form  pp-{profileId}-{addonIdx}-{origCatalogId} */
 function parsePPCatalogId(id: string): { profileId: string; addonIdx: number; origCatalogId: string } | null {
   if (!id.startsWith("pp-") || id === "pp-profiles") return null;
   const body = id.slice(3);
@@ -679,6 +677,107 @@ function handleTestStream(type: string, itemId: string): Response {
   });
 }
 
+// ─── Test ProfileSet (Hardcoded — no KV required) ──────────────────────────────
+
+const TEST_PROFILESET_ID = "test-switch-me";
+
+function buildTestProfileSet(workerUrl: string): ProfileSet {
+  const now = Date.now();
+  const testAddonUrl = `${workerUrl}/proxy/test/manifest.json`;
+  
+  return {
+    id: TEST_PROFILESET_ID,
+    password: "test",
+    name: "🔬 Test Profiles (Switch Me!)",
+    profiles: [
+      {
+        id: "test-alpha",
+        name: "🔴 Alpha",
+        icon: "α",
+        color: "#e8a428",
+        addons: [
+          {
+            manifestUrl: testAddonUrl,
+            label: "Test Addon Alpha",
+            cachedManifest: {
+              name: "Test Addon Alpha",
+              id: "test.addon.alpha",
+              types: ["movie", "series"],
+              resources: ["catalog", "meta", "stream"],
+              catalogs: [
+                { type: "movie", id: "pp-test-alpha", name: "🔴 Alpha Movies" },
+                { type: "series", id: "pp-test-series", name: "🟢 Alpha Series" },
+              ],
+            } as CachedManifest,
+          },
+        ],
+      },
+      {
+        id: "test-beta",
+        name: "🔵 Beta",
+        icon: "β",
+        color: "#2980b9",
+        addons: [
+          {
+            manifestUrl: testAddonUrl,
+            label: "Test Addon Beta",
+            cachedManifest: {
+              name: "Test Addon Beta",
+              id: "test.addon.beta",
+              types: ["movie", "series"],
+              resources: ["catalog", "meta", "stream"],
+              catalogs: [
+                { type: "movie", id: "pp-test-beta", name: "🔵 Beta Movies" },
+                { type: "series", id: "pp-test-series", name: "🟢 Beta Series" },
+              ],
+            } as CachedManifest,
+          },
+        ],
+      },
+      {
+        id: "test-all",
+        name: "✅ All Together",
+        icon: "✓",
+        color: "#27ae60",
+        addons: [
+          {
+            manifestUrl: testAddonUrl,
+            label: "Test Addon Alpha",
+            cachedManifest: {
+              name: "Test Addon Alpha",
+              id: "test.addon.alpha",
+              types: ["movie", "series"],
+              resources: ["catalog", "meta", "stream"],
+              catalogs: [
+                { type: "movie", id: "pp-test-alpha", name: "🔴 Alpha Movies" },
+                { type: "series", id: "pp-test-series", name: "🟢 Alpha Series" },
+              ],
+            } as CachedManifest,
+          },
+          {
+            manifestUrl: testAddonUrl,
+            label: "Test Addon Beta",
+            cachedManifest: {
+              name: "Test Addon Beta",
+              id: "test.addon.beta",
+              types: ["movie", "series"],
+              resources: ["catalog", "meta", "stream"],
+              catalogs: [
+                { type: "movie", id: "pp-test-beta", name: "🔵 Beta Movies" },
+                { type: "series", id: "pp-test-series", name: "🟢 Beta Series" },
+              ],
+            } as CachedManifest,
+          },
+        ],
+      },
+    ],
+    activeProfileId: "test-alpha",
+    cacheGeneration: 0,
+    createdAt: now,
+    updatedAt: now,
+  };
+}
+
 // ─── ProfileSet addon handlers ─────────────────────────────────────────────────────
 
 function handlePSManifest(ps: ProfileSet, workerUrl: string): Response {
@@ -688,7 +787,6 @@ function handlePSManifest(ps: ProfileSet, workerUrl: string): Response {
   let hasUnrestrictedIds = false;
 
   const catalogs: StremioManifestCatalog[] = [
-    // Always first — the profile selector row
     { type: "movie", id: "pp-profiles", name: "👤 Profiles" },
   ];
 
@@ -710,9 +808,7 @@ function handlePSManifest(ps: ProfileSet, workerUrl: string): Response {
     }
   }
 
-  // "movie" is always included so the PROFILES row works
   const allTypes = ["movie", ...contentTypes].filter((v, i, a) => a.indexOf(v) === i);
-
   const idPrefixesForResource = hasUnrestrictedIds ? undefined : [...allIdPrefixes];
 
   const manifest: StremioManifest = {
@@ -748,7 +844,6 @@ function handlePSPoster(ps: ProfileSet, posterType: string): Response {
 async function handlePSCatalog(
   ps: ProfileSet, type: string, catalogId: string, extra: string, workerUrl: string,
 ): Promise<Response> {
-  // ── PROFILES selection row ──────────────────────────────────────────────────
   if (catalogId === "pp-profiles") {
     const metas: StremioMeta[] = ps.profiles.map(profile => {
       const isActive = profile.id === ps.activeProfileId;
@@ -759,19 +854,16 @@ async function handlePSCatalog(
         poster: `${workerUrl}/${ps.id}/poster/${profile.id}.svg`,
         posterShape: "square",
         description: `${profile.addons.length} addon${profile.addons.length !== 1 ? "s" : ""}${isActive ? " · Active" : ""}`,
-        // defaultVideoId makes Stremio go directly to streams on tap (skips detail page)
         behaviorHints: { defaultVideoId: `profile:${profile.id}` },
       };
     });
     return jsonToStremio({ metas });
   }
 
-  // ── Proxied catalog from active profile's addon ─────────────────────────────
   const parsed = parsePPCatalogId(catalogId);
   if (!parsed) return jsonToStremio({ metas: [] });
 
   const { profileId, addonIdx, origCatalogId } = parsed;
-  // Only serve content for the currently active profile
   if (profileId !== ps.activeProfileId) return jsonToStremio({ metas: [] });
 
   const active = getActiveProfile(ps);
@@ -792,7 +884,6 @@ async function handlePSCatalog(
 async function handlePSMeta(
   ps: ProfileSet, type: string, itemId: string, _env: Env, workerUrl: string,
 ): Promise<Response> {
-  // ── Profile detail page ─────────────────────────────────────────────────────
   if (itemId.startsWith("profile:")) {
     const profileId = itemId.slice(8);
     const profile = ps.profiles.find(p => p.id === profileId);
@@ -817,7 +908,6 @@ async function handlePSMeta(
     });
   }
 
-  // ── Aggregate meta from active profile's addons ────────────────────────────
   const active = getActiveProfile(ps);
   if (!active) return jsonToStremio({ meta: null });
 
@@ -835,9 +925,6 @@ async function handlePSMeta(
 async function handlePSStream(
   ps: ProfileSet, type: string, itemId: string, env: Env, _workerUrl: string,
 ): Promise<Response> {
-  // ── Profile activation ──────────────────────────────────────────────────────
-  // Stream request is fired by Stremio when user taps a profile card (via defaultVideoId).
-  // We activate here as a side-effect — no button, no browser, no redirect needed.
   if (itemId.startsWith("profile:")) {
     const profileId = itemId.slice(8);
     const profile = ps.profiles.find(p => p.id === profileId);
@@ -850,12 +937,9 @@ async function handlePSStream(
       await putProfileSet(ps, env);
     }
 
-    // Return empty streams — Stremio shows "no streams" briefly, user presses back,
-    // manifest is re-fetched (no-store), new profile's catalog rows appear instantly.
     return jsonToStremio({ streams: [] });
   }
 
-  // ── Aggregate streams from active profile's addons (parallel) ───────────────
   const active = getActiveProfile(ps);
   if (!active) return jsonToStremio({ streams: [] });
 
@@ -917,7 +1001,6 @@ async function handleCreatePS(req: Request, env: Env, workerUrl: string): Promis
   const id  = crypto.randomUUID();
   const now = Date.now();
 
-  // Build profiles structure, collect fetch tasks
   type FetchTask = { pi: number; ai: number; url: string };
   const fetchTasks: FetchTask[] = [];
 
@@ -937,7 +1020,6 @@ async function handleCreatePS(req: Request, env: Env, workerUrl: string): Promis
     };
   });
 
-  // Parallel manifest fetches
   const fetched = await Promise.allSettled(
     fetchTasks.map(async t => ({ ...t, manifest: await fetchAndCacheAddonManifest(t.url) }))
   );
@@ -1398,6 +1480,47 @@ export default {
       return new Response(adminPageHtml(workerUrl), { headers: { "Content-Type": "text/html" } });
     }
 
+    // ── /test/* (test profile switching — hardcoded, no KV) ───────────────────
+    if (s0 === "test") {
+      const ps = buildTestProfileSet(workerUrl);
+      const resource = s1;
+      if (!resource || resource === "manifest.json") return handlePSManifest(ps, workerUrl);
+
+      if (resource === "poster") {
+        const posterType = s2?.replace(/\.svg$/, "");
+        if (posterType) return handlePSPoster(ps, posterType);
+      }
+
+      if (resource === "catalog" && segments.length >= 2) {
+        const [, type, ...parts] = segments;
+        const raw = parts.join("/").replace(/\.json$/, "");
+        const si  = raw.indexOf("/");
+        const catId = si === -1 ? raw : raw.slice(0, si);
+        const extra = si === -1 ? "" : raw.slice(si + 1);
+        return handlePSCatalog(ps, type, catId, extra, workerUrl);
+      }
+
+      if (resource === "meta" && segments.length >= 3) {
+        const [, type, ...parts] = segments;
+        const itemId = decodeURIComponent(parts.join("/").replace(/\.json$/, ""));
+        return handlePSMeta(ps, type, itemId, env, workerUrl);
+      }
+
+      if (resource === "stream" && segments.length >= 3) {
+        const [, type, ...parts] = segments;
+        const itemId = decodeURIComponent(parts.join("/").replace(/\.json$/, ""));
+        return handlePSStream(ps, type, itemId, env, workerUrl);
+      }
+
+      if (resource === "subtitles" && segments.length >= 3) {
+        const [, type, ...parts] = segments;
+        const itemId = decodeURIComponent(parts.join("/").replace(/\.json$/, ""));
+        return handlePSSubtitles(ps, type, itemId, env);
+      }
+
+      return err("Not found in /test", 404);
+    }
+
     // ── /proxy/test/* (static test addon — no KV) ─────────────────────────────
     if (s0 === "proxy" && s1 === "test") {
       const resource = s2;
@@ -1453,10 +1576,8 @@ export default {
     if (segments.length >= 2 && /^[0-9a-f-]{36}$/i.test(s0)) {
       const [addonId, resource, ...rest] = segments;
 
-      // Configure page always serves SPA
       if (resource === "configure") return env.ASSETS.fetch(request);
 
-      // ── Try proxy first ───────────────────────────────────────────────────
       const cfg = await getConfig(addonId, env);
       if (cfg) {
         if (resource === "manifest.json") return handleManifest(addonId, env, workerUrl);
@@ -1487,7 +1608,6 @@ export default {
         return env.ASSETS.fetch(request);
       }
 
-      // ── Try profileset ────────────────────────────────────────────────────
       const ps = await getProfileSet(addonId, env);
       if (ps) {
         if (resource === "manifest.json") return handlePSManifest(ps, workerUrl);
