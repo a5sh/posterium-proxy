@@ -1480,46 +1480,46 @@ export default {
       return new Response(adminPageHtml(workerUrl), { headers: { "Content-Type": "text/html" } });
     }
 
-    // ── /test/* (test profile switching — hardcoded, no KV) ───────────────────
-    if (s0 === "test") {
-      const ps = buildTestProfileSet(workerUrl);
-      const resource = s1;
-      if (!resource || resource === "manifest.json") return handlePSManifest(ps, workerUrl);
+// ── /test/* ───────────────────────────────────────────────────────────────
+if (s0 === "test") {
+  const ps = buildTestProfileSet(workerUrl);
+  const resource = s1;
+  if (!resource || resource === "manifest.json") return handlePSManifest(ps, workerUrl);
 
-      if (resource === "poster") {
-        const posterType = s2?.replace(/\.svg$/, "");
-        if (posterType) return handlePSPoster(ps, posterType);
-      }
+  if (resource === "poster") {
+    const posterType = s2?.replace(/\.svg$/, "");
+    if (posterType) return handlePSPoster(ps, posterType);
+  }
 
-      if (resource === "catalog" && segments.length >= 2) {
-        const [, type, ...parts] = segments;
-        const raw = parts.join("/").replace(/\.json$/, "");
-        const si  = raw.indexOf("/");
-        const catId = si === -1 ? raw : raw.slice(0, si);
-        const extra = si === -1 ? "" : raw.slice(si + 1);
-        return handlePSCatalog(ps, type, catId, extra, workerUrl);
-      }
+  if (resource === "catalog" && s2) {
+    const type = s2;
+    const raw  = segments.slice(3).join("/").replace(/\.json$/, "");
+    const si   = raw.indexOf("/");
+    const catId = si === -1 ? raw : raw.slice(0, si);
+    const extra = si === -1 ? ""  : raw.slice(si + 1);
+    return handlePSCatalog(ps, type, catId, extra, workerUrl);
+  }
 
-      if (resource === "meta" && segments.length >= 3) {
-        const [, type, ...parts] = segments;
-        const itemId = decodeURIComponent(parts.join("/").replace(/\.json$/, ""));
-        return handlePSMeta(ps, type, itemId, env, workerUrl);
-      }
+  if (resource === "meta" && s2) {
+    const type   = s2;
+    const itemId = decodeURIComponent(segments.slice(3).join("/").replace(/\.json$/, ""));
+    return handlePSMeta(ps, type, itemId, env, workerUrl);
+  }
 
-      if (resource === "stream" && segments.length >= 3) {
-        const [, type, ...parts] = segments;
-        const itemId = decodeURIComponent(parts.join("/").replace(/\.json$/, ""));
-        return handlePSStream(ps, type, itemId, env, workerUrl);
-      }
+  if (resource === "stream" && s2) {
+    const type   = s2;
+    const itemId = decodeURIComponent(segments.slice(3).join("/").replace(/\.json$/, ""));
+    return handlePSStream(ps, type, itemId, env, workerUrl);
+  }
 
-      if (resource === "subtitles" && segments.length >= 3) {
-        const [, type, ...parts] = segments;
-        const itemId = decodeURIComponent(parts.join("/").replace(/\.json$/, ""));
-        return handlePSSubtitles(ps, type, itemId, env);
-      }
+  if (resource === "subtitles" && s2) {
+    const type   = s2;
+    const itemId = decodeURIComponent(segments.slice(3).join("/").replace(/\.json$/, ""));
+    return handlePSSubtitles(ps, type, itemId, env);
+  }
 
-      return err("Not found in /test", 404);
-    }
+  return err("Not found in /test", 404);
+}
 
     // ── /proxy/test/* (static test addon — no KV) ─────────────────────────────
     if (s0 === "proxy" && s1 === "test") {
