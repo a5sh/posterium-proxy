@@ -78,7 +78,6 @@
     .type-pill { padding:5px 14px; border:1px solid var(--border); border-radius:20px; font-size:12px; letter-spacing:.08em; text-transform:uppercase; cursor:pointer; color:var(--silver); background:var(--char); transition:all var(--tr); user-select:none; }
     .type-pill:hover { border-color:var(--muted); color:var(--cream); }
     .type-pill.selected { border-color:var(--amber); color:var(--amber); background:rgba(232,164,40,.08); }
-    /* preview card */
     #preview-card,#preview-card2 { display:none; }
     #preview-card.show,#preview-card2.show { display:block; animation:fadeUp .25s ease; }
     .preview-inner { background:var(--char); border:1px solid var(--border); border-radius:var(--radius); padding:14px; margin-top:10px; }
@@ -92,11 +91,9 @@
     .preview-err  { font-size:12px; color:#e74c3c; margin-top:4px; }
     .preview-warn { font-size:12px; color:#e67e22; margin-top:4px; }
     .preview-loading { font-size:12px; color:var(--silver); padding:6px 0; }
-    /* Presets */
     .preset-bar { display:flex; gap:8px; flex-wrap:wrap; margin-bottom:18px; }
     .preset-btn { padding:5px 13px; border:1px solid var(--border); border-radius:20px; font-size:12px; color:var(--silver); background:var(--char); cursor:pointer; transition:all var(--tr); }
     .preset-btn:hover { border-color:var(--amber); color:var(--amber); }
-    /* buttons */
     .btn-primary { width:100%; padding:14px 24px; background:var(--amber); color:var(--black); border:none; border-radius:var(--radius); font-family:'Bebas Neue',sans-serif; font-size:17px; letter-spacing:.12em; cursor:pointer; transition:background var(--tr),transform .1s; margin-top:6px; }
     .btn-primary:hover { background:var(--amber2); }
     .btn-primary:active { transform:scale(.99); }
@@ -107,10 +104,10 @@
     .btn-sm:hover { border-color:var(--amber); color:var(--amber); }
     .spinner { width:15px; height:15px; border:2px solid rgba(0,0,0,.3); border-top-color:var(--black); border-radius:50%; animation:spin .7s linear infinite; display:inline-block; vertical-align:middle; margin-right:6px; }
     @keyframes spin { to{transform:rotate(360deg);} }
-    #error,#error2 { display:none; background:rgba(192,57,43,.1); border:1px solid rgba(192,57,43,.4); border-radius:var(--radius); padding:13px 16px; color:#e74c3c; font-size:13px; margin-top:12px; }
-    #error.visible,#error2.visible { display:block; animation:fadeUp .25s ease; }
-    #result,#result2 { display:none; margin-top:20px; }
-    #result.visible,#result2.visible { display:block; animation:fadeUp .3s ease; }
+    .error-box { display:none; background:rgba(192,57,43,.1); border:1px solid rgba(192,57,43,.4); border-radius:var(--radius); padding:13px 16px; color:#e74c3c; font-size:13px; margin-top:12px; }
+    .error-box.visible { display:block; animation:fadeUp .25s ease; }
+    .result-wrap { display:none; margin-top:20px; }
+    .result-wrap.visible { display:block; animation:fadeUp .3s ease; }
     @keyframes fadeUp { from{opacity:0;transform:translateY(10px);} to{opacity:1;transform:translateY(0);} }
     .result-card { background:linear-gradient(135deg,#0e1a0a,#0a1500); border:1px solid #2a4020; border-radius:var(--radius); padding:20px 24px; }
     .result-title { font-family:'Bebas Neue',sans-serif; font-size:13px; letter-spacing:.18em; color:var(--green); margin-bottom:14px; display:flex; align-items:center; gap:8px; }
@@ -124,10 +121,8 @@
     .install-btn:hover { background:#2ecc71; }
     .save-note { font-size:11px; color:#5a7a50; margin-top:12px; padding:10px 12px; background:rgba(0,0,0,.3); border-radius:4px; border:1px solid #1a3010; }
     .save-note strong { color:var(--amber); }
-    /* edit tab */
-    .load-box { background:var(--dark); border:1px solid var(--border); border-radius:var(--radius); padding:24px; margin-top:20px; }
-    .load-box-title { font-family:'Bebas Neue',sans-serif; font-size:16px; letter-spacing:.15em; color:var(--amber); margin-bottom:16px; }
-    /* password toggle */
+    .edit-banner { background:rgba(232,164,40,.06); border:1px solid rgba(232,164,40,.2); border-radius:var(--radius); padding:12px 16px; margin-bottom:20px; font-size:13px; color:var(--amber); display:none; }
+    .edit-banner.show { display:block; }
     .pw-wrap { position:relative; }
     .pw-toggle { position:absolute; right:10px; top:50%; transform:translateY(-50%); background:none; border:none; color:var(--silver); cursor:pointer; font-size:12px; padding:4px; }
     .pw-toggle:hover { color:var(--amber); }
@@ -135,9 +130,46 @@
     footer { text-align:center; padding:20px; border-top:1px solid var(--border); font-size:12px; color:var(--muted); letter-spacing:.06em; }
     footer a { color:var(--silver); text-decoration:none; }
     footer a:hover { color:var(--amber); }
-    /* Edit proxy highlight */
-    .edit-banner { background:rgba(232,164,40,.06); border:1px solid rgba(232,164,40,.2); border-radius:var(--radius); padding:12px 16px; margin-bottom:20px; font-size:13px; color:var(--amber); display:none; }
-    .edit-banner.show { display:block; }
+
+    /* ── Profile Set Styles ────────────────────────────────────────── */
+    .ps-info-box { background:rgba(41,128,185,.07); border:1px solid rgba(41,128,185,.22); border-radius:var(--radius); padding:14px 18px; margin-bottom:0; font-size:13px; color:#7fb3d3; line-height:1.65; }
+    .ps-info-box strong { color:#5dade2; }
+    .ps-info-box .ps-flow { display:flex; gap:10px; flex-wrap:wrap; margin-top:8px; }
+    .ps-flow-step { background:rgba(41,128,185,.12); border:1px solid rgba(41,128,185,.2); border-radius:4px; padding:4px 10px; font-size:11px; letter-spacing:.08em; }
+
+    .profile-card { background:var(--char); border:1px solid var(--border); border-radius:var(--radius); padding:18px; margin-bottom:12px; transition:border-color var(--tr); }
+    .profile-card:hover { border-color:var(--muted); }
+    .profile-card-header { display:flex; align-items:center; gap:10px; flex-wrap:wrap; margin-bottom:16px; }
+    .profile-icon-badge { width:44px; height:44px; border-radius:10px; display:flex; align-items:center; justify-content:center; font-size:22px; flex-shrink:0; transition:background var(--tr); cursor:default; user-select:none; }
+    .ps-inp { background:var(--dark); border:1px solid var(--border); border-radius:var(--radius); color:var(--cream); font-family:'DM Sans',sans-serif; font-size:13px; padding:8px 11px; outline:none; transition:border-color var(--tr),background var(--tr); width:auto; }
+    .ps-inp:focus { border-color:var(--amber); background:#101010; }
+    .ps-inp-name { flex:1; min-width:130px; font-size:14px; font-weight:400; }
+    .ps-inp-icon { width:50px; text-align:center; font-size:18px; padding:7px 4px; }
+    .ps-inp-mono { font-family:'JetBrains Mono',monospace; font-size:12px; }
+    .color-swatches { display:flex; gap:6px; flex-wrap:wrap; align-items:center; }
+    .color-swatch { width:19px; height:19px; border-radius:50%; cursor:pointer; border:2px solid transparent; transition:all .15s; flex-shrink:0; }
+    .color-swatch:hover { transform:scale(1.2); }
+    .color-swatch.active { border-color:#fff; transform:scale(1.25); box-shadow:0 0 0 1px rgba(255,255,255,.3); }
+    .profile-remove-btn { margin-left:auto; background:none; border:1px solid rgba(192,57,43,.3); color:#c0392b; padding:5px 11px; border-radius:var(--radius); cursor:pointer; font-size:12px; transition:all var(--tr); white-space:nowrap; flex-shrink:0; }
+    .profile-remove-btn:hover { background:rgba(192,57,43,.1); border-color:var(--red); color:#e74c3c; }
+    .ps-addon-section-label { font-size:11px; letter-spacing:.12em; text-transform:uppercase; color:var(--silver); margin-bottom:8px; }
+    .addon-row { display:flex; gap:8px; align-items:center; margin-bottom:8px; }
+    .addon-row-url { flex:1; min-width:0; }
+    .addon-row-label { width:105px; flex-shrink:0; }
+    @media(max-width:600px){ .addon-row { flex-wrap:wrap; } .addon-row-label { width:100%; } }
+    .addon-remove-btn { background:none; border:1px solid var(--border); color:var(--muted); padding:6px 9px; border-radius:var(--radius); cursor:pointer; font-size:11px; transition:all var(--tr); flex-shrink:0; line-height:1; }
+    .addon-remove-btn:hover { border-color:#c0392b; color:#e74c3c; }
+    .add-addon-btn { width:100%; padding:7px; border:1px dashed var(--border); background:transparent; color:var(--muted); border-radius:var(--radius); cursor:pointer; font-size:12px; letter-spacing:.08em; transition:all var(--tr); margin-top:4px; }
+    .add-addon-btn:hover { border-color:var(--amber); color:var(--amber); }
+    .quick-addons { display:flex; gap:5px; flex-wrap:wrap; margin-top:8px; }
+    .quick-chip { background:rgba(41,128,185,.1); border:1px solid rgba(41,128,185,.25); border-radius:3px; padding:2px 8px; font-family:'JetBrains Mono',monospace; font-size:10px; color:#5dade2; cursor:pointer; transition:all var(--tr); }
+    .quick-chip:hover { background:rgba(41,128,185,.2); border-color:#5dade2; }
+    .add-profile-btn { width:100%; padding:13px; border:1px dashed var(--muted); background:transparent; color:var(--silver); border-radius:var(--radius); cursor:pointer; font-family:'Bebas Neue',sans-serif; font-size:14px; letter-spacing:.12em; transition:all var(--tr); margin-top:8px; }
+    .add-profile-btn:hover { border-color:var(--amber); color:var(--amber); }
+    .empty-profiles-hint { text-align:center; padding:32px 20px; color:var(--muted); font-size:13px; }
+
+    /* active-profile indicator in edit */
+    .active-badge { display:inline-block; background:rgba(39,174,96,.15); border:1px solid rgba(39,174,96,.3); color:var(--green); border-radius:3px; font-size:10px; letter-spacing:.08em; padding:1px 6px; margin-left:6px; text-transform:uppercase; vertical-align:middle; }
   </style>
 </head>
 <body>
@@ -152,7 +184,8 @@
   <p class="tagline">Proxy any Stremio addon — replace artwork, filter, transform, cache</p>
   <div class="tab-bar">
     <div class="tab active" data-tab="create">Create Proxy</div>
-    <div class="tab" data-tab="edit">Edit My Proxy</div>
+    <div class="tab" data-tab="profileset">Profile Set</div>
+    <div class="tab" data-tab="edit">Edit / Manage</div>
   </div>
 </header>
 
@@ -161,11 +194,10 @@
 <!-- ══════════════════════════ CREATE TAB ══════════════════════════ -->
 <div class="tab-page active" id="tab-create">
 
-  <!-- Quick presets -->
   <div class="divider"><span class="divider-label">Quick Presets</span></div>
   <div class="card">
     <div class="card-label">Start From a Preset</div>
-    <div class="card-sublabel">Presets set sensible defaults — you can adjust anything afterwards.</div>
+    <div class="card-sublabel">Presets set sensible defaults — adjust anything afterwards.</div>
     <div class="preset-bar">
       <button class="preset-btn" onclick="applyPreset('passthrough')">🔁 Passthrough (no changes)</button>
       <button class="preset-btn" onclick="applyPreset('artwork')">🎨 Artwork Override</button>
@@ -175,7 +207,6 @@
     </div>
   </div>
 
-  <!-- Step 1: Upstream -->
   <div class="divider"><span class="divider-label">Step 1 — Upstream Addon</span></div>
   <div class="card">
     <div class="card-label">Source Addon</div>
@@ -191,7 +222,6 @@
     </div>
   </div>
 
-  <!-- Step 2: Artwork -->
   <div class="divider"><span class="divider-label">Step 2 — Artwork Overrides</span></div>
   <div class="card">
     <div class="card-label">Image URL Templates</div>
@@ -240,7 +270,6 @@
     </div>
   </div>
 
-  <!-- Step 3: Text -->
   <div class="divider"><span class="divider-label">Step 3 — Name &amp; Description</span></div>
   <div class="card">
     <div class="card-label">Text Overrides</div>
@@ -254,7 +283,6 @@
     </div>
   </div>
 
-  <!-- Step 4: Resources & Features -->
   <div class="divider"><span class="divider-label">Step 4 — Resources &amp; Feature Toggles</span></div>
   <div class="card">
     <div class="card-label">Resource Toggles</div>
@@ -282,7 +310,6 @@
     </div>
   </div>
 
-  <!-- Step 5: Content Filters -->
   <div class="divider"><span class="divider-label">Step 5 — Content Filters</span></div>
   <div class="card">
     <div class="card-label">Content Type Filter</div>
@@ -356,7 +383,6 @@
     </div>
   </div>
 
-  <!-- Step 6: Stream Transforms (NEW) -->
   <div class="divider"><span class="divider-label">Step 6 — Stream Transforms</span></div>
   <div class="card">
     <div class="card-label">Stream Sorting &amp; Limits</div>
@@ -386,11 +412,9 @@
     </div>
   </div>
 
-  <!-- Step 7: Metadata Filters (NEW) -->
   <div class="divider"><span class="divider-label">Step 7 — Metadata Filters</span></div>
   <div class="card">
     <div class="card-label">Catalog Quality Filtering</div>
-    <div class="card-sublabel">Filter out low-quality items from catalog responses before sending to Stremio.</div>
     <div class="g2">
       <div class="field">
         <label>Minimum IMDb rating <span class="hint">0 = no filter</span></label>
@@ -403,7 +427,6 @@
     </div>
   </div>
 
-  <!-- Step 8: Subtitles -->
   <div class="divider"><span class="divider-label">Step 8 — Subtitle Languages</span></div>
   <div class="card">
     <div class="card-label">Subtitle Language Whitelist</div>
@@ -425,13 +448,10 @@
     </div>
   </div>
 
-  <!-- Step 9: Cache -->
   <div class="divider"><span class="divider-label">Step 9 — Edge Cache TTLs (optional)</span></div>
   <div class="card">
     <div class="card-label">Cache Durations</div>
-    <div class="card-sublabel">
-      Responses are always served fresh to Stremio (<code>no-store</code>) but cached internally for speed. Set 0 to use smart defaults (catalog 30m, meta 24h, streams 5m, subtitles 1h).
-    </div>
+    <div class="card-sublabel">Set 0 to use smart defaults (catalog 30m, meta 24h, streams 5m, subtitles 1h).</div>
     <div class="g4">
       <div class="field"><label>Catalog <span class="hint">secs</span></label><input type="number" id="catalogCacheTtl" value="0" min="0" max="86400" /></div>
       <div class="field"><label>Meta <span class="hint">secs</span></label><input type="number" id="metaCacheTtl" value="0" min="0" max="86400" /></div>
@@ -440,11 +460,10 @@
     </div>
   </div>
 
-  <!-- Step 10: Password -->
   <div class="divider"><span class="divider-label">Step 10 — Set Your Proxy Password</span></div>
   <div class="card">
     <div class="card-label">Proxy Password</div>
-    <div class="card-sublabel">Used to edit or delete your proxy later at <code>/{id}/configure</code>. Choose something you'll remember. Minimum 4 characters.</div>
+    <div class="card-sublabel">Used to edit or delete your proxy later. Minimum 4 characters.</div>
     <div class="field">
       <label>Password <span class="hint">— required</span></label>
       <div class="pw-wrap">
@@ -462,8 +481,8 @@
   </div>
 
   <button class="btn-primary" id="createBtn" onclick="createProxy()">Generate Proxy Addon</button>
-  <div id="error"></div>
-  <div id="result">
+  <div id="error" class="error-box"></div>
+  <div id="result" class="result-wrap">
     <div class="result-card">
       <div class="result-title">Proxy Addon Created</div>
       <div class="result-row">
@@ -482,43 +501,115 @@
         <svg width="13" height="13" viewBox="0 0 14 14" fill="none"><path d="M7 1v9M2 7l5 5 5-5M1 13h12" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
         Install in Stremio
       </a>
-      <div class="save-note">
-        🔐 <strong>Save these details!</strong> You'll need your proxy ID and password to edit or delete this proxy at the Configure URL above.
-      </div>
+      <div class="save-note">🔐 <strong>Save these details!</strong> You need your proxy ID and password to edit at the Configure URL.</div>
     </div>
   </div>
 
 </div><!-- /tab-create -->
 
-<!-- ══════════════════════════ EDIT TAB ══════════════════════════ -->
+<!-- ══════════════════════════ PROFILE SET TAB ══════════════════════════ -->
+<div class="tab-page" id="tab-profileset">
+
+  <div class="divider"><span class="divider-label">What is a Profile Set?</span></div>
+  <div class="card">
+    <div class="ps-info-box">
+      <strong>One Stremio URL. Multiple accounts.</strong> Create profiles like Work and Kids — each with their own addon list.
+      Stremio shows a <strong>Profiles</strong> catalog row at the top. Tap any profile card to switch; its addons load immediately — no refresh, no buttons.
+      <div class="ps-flow">
+        <div class="ps-flow-step">📋 Build profiles on this page</div>
+        <div class="ps-flow-step">🔗 Paste one URL into Stremio</div>
+        <div class="ps-flow-step">👤 Tap profile card to switch</div>
+        <div class="ps-flow-step">🎬 Addons load instantly</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="divider"><span class="divider-label">Step 1 — Name Your Profile Set</span></div>
+  <div class="card">
+    <div class="card-label">Profile Set Name</div>
+    <div class="card-sublabel">This is the name Stremio shows for the addon.</div>
+    <div class="field">
+      <label>Name</label>
+      <input type="text" id="psName" placeholder="My Stremio Profiles" style="font-family:'DM Sans',sans-serif" />
+    </div>
+  </div>
+
+  <div class="divider"><span class="divider-label">Step 2 — Build Your Profiles</span></div>
+  <div class="card">
+    <div class="card-label">Profiles</div>
+    <div class="card-sublabel">Add each profile below. Each has its own addon list — what those addons provide (catalogs, streams, subtitles) will be available when that profile is active.</div>
+    <div id="ps-profiles"><!-- rendered by renderProfiles() --></div>
+  </div>
+
+  <div class="divider"><span class="divider-label">Step 3 — Password</span></div>
+  <div class="card">
+    <div class="card-label">Access Password</div>
+    <div class="card-sublabel">Used to edit or delete your profiles later. Minimum 4 characters.</div>
+    <div class="field">
+      <label>Password <span class="hint">— required</span></label>
+      <div class="pw-wrap">
+        <input type="password" id="psPassword" placeholder="Set a password" autocomplete="new-password" />
+        <button class="pw-toggle" onclick="togglePw('psPassword')" type="button">Show</button>
+      </div>
+    </div>
+  </div>
+
+  <button class="btn-primary" id="psCreateBtn" onclick="createProfileSet()">Create Profile Set Addon</button>
+  <div id="ps-error" class="error-box"></div>
+  <div id="ps-result" class="result-wrap">
+    <div class="result-card">
+      <div class="result-title">Profile Set Created</div>
+      <div class="result-row">
+        <div class="result-label">Manifest URL — paste into Stremio</div>
+        <div class="result-url"><span id="ps-res-manifest" style="flex:1;word-break:break-all"></span><button class="copy-btn" onclick="copyTo('ps-res-manifest',this)">Copy</button></div>
+      </div>
+      <div class="result-row">
+        <div class="result-label">Stremio Deep Link</div>
+        <div class="result-url"><span id="ps-res-stremio" style="flex:1;word-break:break-all"></span><button class="copy-btn" onclick="copyTo('ps-res-stremio',this)">Copy</button></div>
+      </div>
+      <div class="result-row">
+        <div class="result-label">Configure URL (edit profiles later)</div>
+        <div class="result-url"><span id="ps-res-configure" style="flex:1;word-break:break-all"></span><button class="copy-btn" onclick="copyTo('ps-res-configure',this)">Copy</button></div>
+      </div>
+      <a id="ps-install-link" href="#" class="install-btn" target="_blank">
+        <svg width="13" height="13" viewBox="0 0 14 14" fill="none"><path d="M7 1v9M2 7l5 5 5-5M1 13h12" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+        Install in Stremio
+      </a>
+      <div class="save-note">🔐 <strong>Save these details!</strong> You'll need your ID and password to add, remove, or update profiles.</div>
+    </div>
+  </div>
+
+</div><!-- /tab-profileset -->
+
+<!-- ══════════════════════════ EDIT / MANAGE TAB ══════════════════════════ -->
 <div class="tab-page" id="tab-edit">
 
-  <div class="divider"><span class="divider-label">Load Your Proxy</span></div>
+  <div class="divider"><span class="divider-label">Load Your Config</span></div>
 
   <div class="edit-banner" id="editBanner"></div>
 
   <div class="card" id="loadBox">
-    <div class="card-label">Proxy Credentials</div>
-    <div class="card-sublabel">Enter your proxy ID and password to load your configuration for editing.</div>
+    <div class="card-label">Credentials</div>
+    <div class="card-sublabel">Works for both single-addon Proxies and Profile Sets. The ID is the UUID in your manifest URL.</div>
     <div class="g2">
       <div class="field">
-        <label>Proxy ID</label>
+        <label>Proxy / Profile Set ID</label>
         <input type="text" id="editProxyId" placeholder="xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx" />
       </div>
       <div class="field">
         <label>Password</label>
         <div class="pw-wrap">
-          <input type="password" id="editPassword" placeholder="Your proxy password" />
+          <input type="password" id="editPassword" placeholder="Your password" />
           <button class="pw-toggle" onclick="togglePw('editPassword')" type="button">Show</button>
         </div>
       </div>
     </div>
-    <button class="btn-sm" style="margin-top:8px;width:100%" onclick="loadProxyForEdit()">Load Proxy Config</button>
+    <button class="btn-sm" style="margin-top:8px;width:100%" onclick="loadConfigForEdit()">Load Config</button>
     <div id="loadError" style="display:none;margin-top:10px;color:#e74c3c;font-size:12px"></div>
   </div>
 
-  <!-- Edit form (hidden until config loaded) -->
-  <div id="editForm" style="display:none">
+  <!-- ── Proxy Edit Form ─────────────────────────────────────────── -->
+  <div id="editProxyForm" style="display:none">
     <div class="divider"><span class="divider-label">Upstream Addon</span></div>
     <div class="card">
       <div class="card-label">Change Upstream</div>
@@ -589,8 +680,8 @@
     <button class="btn-sm" style="width:100%;margin-top:8px" onclick="flushProxyCache()">🗑 Flush Edge Cache</button>
     <button class="btn-danger" onclick="deleteProxy()">Delete This Proxy</button>
 
-    <div id="error2"></div>
-    <div id="result2">
+    <div id="error2" class="error-box"></div>
+    <div id="result2" class="result-wrap">
       <div class="result-card">
         <div class="result-title">Proxy Updated</div>
         <div class="result-row">
@@ -604,214 +695,236 @@
         <a id="installLink2" href="#" class="install-btn" target="_blank">Install in Stremio</a>
       </div>
     </div>
-  </div>
+  </div><!-- /editProxyForm -->
+
+  <!-- ── Profile Set Edit Form ──────────────────────────────────── -->
+  <div id="editPSForm" style="display:none">
+
+    <div class="divider"><span class="divider-label">Profile Set Name</span></div>
+    <div class="card">
+      <div class="field"><label>Name</label><input type="text" id="ePSName" placeholder="My Stremio Profiles" style="font-family:'DM Sans',sans-serif" /></div>
+    </div>
+
+    <div class="divider"><span class="divider-label">Profiles</span></div>
+    <div class="card">
+      <div class="card-label">Your Profiles</div>
+      <div class="card-sublabel">Changes take effect immediately after saving. The active profile is highlighted.</div>
+      <div id="ps-edit-profiles"><!-- rendered by renderProfiles() --></div>
+    </div>
+
+    <button class="btn-primary" id="ePSUpdateBtn" onclick="updateProfileSet()">Save Profile Set</button>
+    <button class="btn-sm" style="width:100%;margin-top:8px" onclick="flushPSCache()">🗑 Flush Cache</button>
+    <button class="btn-danger" onclick="deleteProfileSet()">Delete This Profile Set</button>
+
+    <div id="ps-edit-error" class="error-box"></div>
+    <div id="ps-edit-result" class="result-wrap">
+      <div class="result-card">
+        <div class="result-title">Profile Set Updated</div>
+        <div class="result-row">
+          <div class="result-label">Manifest URL</div>
+          <div class="result-url"><span id="ps-edit-res-manifest" style="flex:1;word-break:break-all"></span><button class="copy-btn" onclick="copyTo('ps-edit-res-manifest',this)">Copy</button></div>
+        </div>
+        <a id="ps-edit-install-link" href="#" class="install-btn" target="_blank">Install in Stremio</a>
+      </div>
+    </div>
+  </div><!-- /editPSForm -->
 
 </div><!-- /tab-edit -->
+
 </main>
 
 <footer>
-  <p>PosteriumProxy v3 — built on <a href="https://workers.cloudflare.com" target="_blank">Cloudflare Workers</a>
+  <p>PosteriumProxy v4 — built on <a href="https://workers.cloudflare.com" target="_blank">Cloudflare Workers</a>
+  &nbsp;·&nbsp; Test Addon: <a href="/proxy/test/manifest.json" target="_blank">/proxy/test</a>
   &nbsp;·&nbsp; Admin: <a href="/manage">/manage</a></p>
 </footer>
 
 <script>
-// ─── State ──────────────────────────────────────────────────────────────────
+// ─── Shared helpers ─────────────────────────────────────────────────────────
 const SVG_CHK = '<svg width="9" height="7" viewBox="0 0 9 7"><path d="M1 3.5l2.5 2.5 4.5-5" stroke="#000" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" fill="none"/></svg>';
 
-// ─── Tabs ───────────────────────────────────────────────────────────────────
-document.querySelectorAll('.tab').forEach(t => {
-  t.addEventListener('click', () => {
-    document.querySelectorAll('.tab,.tab-page').forEach(x => x.classList.remove('active'));
+function esc(s) { return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;'); }
+function escA(s) { return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;').replace(/'/g,'&#39;'); }
+
+function togglePw(id) { const el=document.getElementById(id); el.type=el.type==='password'?'text':'password'; }
+
+function copyTo(id, btn) {
+  navigator.clipboard.writeText(document.getElementById(id).textContent).then(()=>{
+    const orig=btn.textContent; btn.textContent='Copied!'; btn.classList.add('copied');
+    setTimeout(()=>{btn.textContent=orig;btn.classList.remove('copied');},2000);
+  });
+}
+
+function setLoading(id, v, msg='') {
+  const btn=document.getElementById(id);
+  if(!btn) return;
+  if(v && !btn.dataset.orig) btn.dataset.orig=btn.innerHTML;
+  btn.disabled=v;
+  btn.innerHTML=v?`<span class="spinner"></span>${msg}`:btn.dataset.orig||btn.textContent;
+}
+
+// ─── Tabs ────────────────────────────────────────────────────────────────────
+document.querySelectorAll('.tab').forEach(t=>{
+  t.addEventListener('click',()=>{
+    document.querySelectorAll('.tab,.tab-page').forEach(x=>x.classList.remove('active'));
     t.classList.add('active');
-    document.getElementById('tab-' + t.dataset.tab).classList.add('active');
+    document.getElementById('tab-'+t.dataset.tab).classList.add('active');
   });
 });
 
-// ─── Detect /:id/configure path ─────────────────────────────────────────────
-(function detectConfigurePath() {
-  const m = window.location.pathname.match(/^\/([0-9a-f-]{36})\/configure$/i);
-  if (m) {
-    document.querySelector('.tab[data-tab="edit"]').click();
-    document.getElementById('editProxyId').value = m[1];
-    const banner = document.getElementById('editBanner');
-    banner.textContent = `✏ Loading configuration for proxy ${m[1]}…`;
-    banner.classList.add('show');
-    // Show the load box focused
-    document.getElementById('editPassword').focus();
-  }
+// Auto-detect /:id/configure path
+(function detectConfigurePath(){
+  const m=window.location.pathname.match(/^\/([0-9a-f-]{36})\/configure$/i);
+  if(!m) return;
+  document.querySelector('.tab[data-tab="edit"]').click();
+  document.getElementById('editProxyId').value=m[1];
+  const banner=document.getElementById('editBanner');
+  banner.textContent=`✏ Loading configuration for ${m[1]}…`;
+  banner.classList.add('show');
+  document.getElementById('editPassword').focus();
 })();
 
-// ─── Checkboxes ──────────────────────────────────────────────────────────────
-document.querySelectorAll('.check-item').forEach(item => {
-  item.addEventListener('click', function(e) {
-    if (e.target.tagName === 'INPUT') return;
-    const cb = this.querySelector('input[type="checkbox"]');
-    cb.checked = !cb.checked;
-    const c = this.dataset.color;
+// ─── Checkbox toggles ────────────────────────────────────────────────────────
+document.querySelectorAll('.check-item').forEach(item=>{
+  item.addEventListener('click',function(e){
+    if(e.target.tagName==='INPUT') return;
+    const cb=this.querySelector('input[type="checkbox"]');
+    cb.checked=!cb.checked;
+    const c=this.dataset.color;
     this.classList.remove('checked','checked-gr','checked-rd');
-    if (cb.checked) this.classList.add(c === 'gr' ? 'checked-gr' : c === 'rd' ? 'checked-rd' : 'checked');
+    if(cb.checked) this.classList.add(c==='gr'?'checked-gr':c==='rd'?'checked-rd':'checked');
   });
-  const cb = item.querySelector('input[type="checkbox"]');
-  const c = item.dataset.color;
-  if (cb.checked) item.classList.add(c === 'gr' ? 'checked-gr' : c === 'rd' ? 'checked-rd' : 'checked');
+  const cb=item.querySelector('input[type="checkbox"]');
+  const c=item.dataset.color;
+  if(cb.checked) item.classList.add(c==='gr'?'checked-gr':c==='rd'?'checked-rd':'checked');
 });
 
-// ─── Types ───────────────────────────────────────────────────────────────────
-function toggleType(el) { el.classList.toggle('selected'); }
-function getSelectedTypes() { return [...document.querySelectorAll('.type-pill.selected')].map(p => p.dataset.type); }
+function setCheck(id,val){
+  const el=document.getElementById(id); if(!el) return;
+  el.checked=val;
+  const item=el.closest('.check-item'); if(!item) return;
+  const c=item.dataset.color;
+  item.classList.remove('checked','checked-gr','checked-rd');
+  if(val) item.classList.add(c==='gr'?'checked-gr':c==='rd'?'checked-rd':'checked');
+}
+
+// ─── Type pills ──────────────────────────────────────────────────────────────
+function toggleType(el){ el.classList.toggle('selected'); }
+function getSelectedTypes(){ return [...document.querySelectorAll('.type-pill.selected')].map(p=>p.dataset.type); }
 
 // ─── Var chips ───────────────────────────────────────────────────────────────
-function insertVar(fieldId, v) {
-  const el = document.getElementById(fieldId);
-  const s = el.selectionStart, e = el.selectionEnd;
-  el.value = el.value.slice(0,s) + v + el.value.slice(e);
-  el.setSelectionRange(s+v.length, s+v.length); el.focus();
+function insertVar(fieldId,v){
+  const el=document.getElementById(fieldId);
+  const s=el.selectionStart,e=el.selectionEnd;
+  el.value=el.value.slice(0,s)+v+el.value.slice(e);
+  el.setSelectionRange(s+v.length,s+v.length); el.focus();
 }
-function addLang(code) {
-  const el = document.getElementById('subtitleLanguages');
-  const ex = el.value.split(',').map(s=>s.trim()).filter(Boolean);
-  if (!ex.includes(code)) el.value = [...ex, code].join(', ');
+function addLang(code){
+  const el=document.getElementById('subtitleLanguages');
+  const ex=el.value.split(',').map(s=>s.trim()).filter(Boolean);
+  if(!ex.includes(code)) el.value=[...ex,code].join(', ');
 }
-function addPfx(pfx) {
-  const el = document.getElementById('idPrefixFilter');
-  const ex = el.value.split(',').map(s=>s.trim()).filter(Boolean);
-  if (!ex.includes(pfx)) el.value = [...ex, pfx].join(', ');
-}
-
-// ─── Password toggle ─────────────────────────────────────────────────────────
-function togglePw(id) {
-  const el = document.getElementById(id);
-  el.type = el.type === 'password' ? 'text' : 'password';
+function addPfx(pfx){
+  const el=document.getElementById('idPrefixFilter');
+  const ex=el.value.split(',').map(s=>s.trim()).filter(Boolean);
+  if(!ex.includes(pfx)) el.value=[...ex,pfx].join(', ');
 }
 
-// ─── Copy ─────────────────────────────────────────────────────────────────────
-function copyTo(id, btn) {
-  navigator.clipboard.writeText(document.getElementById(id).textContent).then(() => {
-    const orig = btn.textContent; btn.textContent = 'Copied!'; btn.classList.add('copied');
-    setTimeout(() => { btn.textContent = orig; btn.classList.remove('copied'); }, 2000);
-  });
-}
-
-// ─── Error/result helpers ─────────────────────────────────────────────────────
-function showError(msg, detail, num='') {
-  const el = document.getElementById('error'+num);
-  el.innerHTML = `<strong>${esc(msg)}</strong>${detail ? `<br><span style="font-size:11px;opacity:.8">${esc(Array.isArray(detail)?detail.join(' · '):detail)}</span>` : ''}`;
+// ─── Error helpers ────────────────────────────────────────────────────────────
+function showError(msg,detail,sfx=''){
+  const el=document.getElementById('error'+sfx);
+  if(!el) return;
+  el.innerHTML=`<strong>${esc(msg)}</strong>${detail?`<br><span style="font-size:11px;opacity:.8">${esc(Array.isArray(detail)?detail.join(' · '):detail)}</span>`:''}`;
   el.classList.add('visible');
-  document.getElementById('result'+num)?.classList.remove('visible');
+  const res=document.getElementById('result'+sfx); if(res) res.classList.remove('visible');
 }
-function clearError(num='') { const el = document.getElementById('error'+num); el.innerHTML=''; el.classList.remove('visible'); }
-function setLoading(id, v, msg='') {
-  const btn = document.getElementById(id);
-  btn.disabled = v;
-  btn.innerHTML = v ? `<span class="spinner"></span>${msg}` : btn.dataset.orig || btn.textContent;
-  if (!v && !btn.dataset.orig) btn.dataset.orig = btn.innerHTML;
-}
-function esc(s) { return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;'); }
+function clearError(sfx=''){ const el=document.getElementById('error'+sfx); if(!el) return; el.innerHTML=''; el.classList.remove('visible'); }
 
-// ─── Presets ─────────────────────────────────────────────────────────────────
-const PRESETS = {
-  passthrough: {},
-  artwork: { removeTrailers: false },
-  clean: { forceHttpsStreams: true, stripTorrents: true, stripMagnetStreams: true, stripP2PFlag: true },
-  lite: { enableCatalog: false, enableSubtitles: false, removeHeavyArtwork: true, removeTrailers: true },
-  cached: { catalogCacheTtl: 7200, metaCacheTtl: 86400, streamCacheTtl: 600, subtitleCacheTtl: 7200, offlineCache: true },
+function showPSError(msg,sfx=''){
+  const el=document.getElementById('ps'+sfx+'-error')||document.getElementById('ps-error');
+  if(!el) return;
+  el.innerHTML=`<strong>${esc(msg)}</strong>`;
+  el.classList.add('visible');
+}
+function clearPSError(sfx=''){
+  const el=document.getElementById('ps'+sfx+'-error')||document.getElementById('ps-error');
+  if(el){ el.innerHTML=''; el.classList.remove('visible'); }
+}
+
+// ─── Presets (Create Proxy tab) ──────────────────────────────────────────────
+const PRESETS={
+  passthrough:{},
+  artwork:{},
+  clean:{forceHttpsStreams:true,stripTorrents:true,stripMagnetStreams:true,stripP2PFlag:true},
+  lite:{enableCatalog:false,enableSubtitles:false,removeHeavyArtwork:true,removeTrailers:true},
+  cached:{catalogCacheTtl:7200,metaCacheTtl:86400,streamCacheTtl:600,subtitleCacheTtl:7200,offlineCache:true},
 };
-
-function applyPreset(name) {
-  const p = PRESETS[name] || {};
-  // Reset all toggles
-  ['enableCatalog','enableMeta','enableStreams','enableSubtitles','enableSearch'].forEach(id => setCheck(id, true));
-  ['forceHttpsStreams','stripTorrents','stripMagnetStreams','stripAdultFlag','stripP2PFlag','offlineCache','removeTrailers','removeHeavyArtwork','removeDuplicateStreams'].forEach(id => setCheck(id, false));
-  if ('catalogCacheTtl' in p) document.getElementById('catalogCacheTtl').value = p.catalogCacheTtl;
-  if ('metaCacheTtl' in p) document.getElementById('metaCacheTtl').value = p.metaCacheTtl;
-  if ('streamCacheTtl' in p) document.getElementById('streamCacheTtl').value = p.streamCacheTtl;
-  if ('subtitleCacheTtl' in p) document.getElementById('subtitleCacheTtl').value = p.subtitleCacheTtl;
-  Object.entries(p).forEach(([k,v]) => { if (typeof v === 'boolean') setCheck(k, v); });
-  if (name === 'lite') { setCheck('enableCatalog', false); setCheck('enableSubtitles', false); }
-}
-
-function setCheck(id, val) {
-  const el = document.getElementById(id);
-  if (!el) return;
-  el.checked = val;
-  const item = el.closest('.check-item');
-  if (!item) return;
-  const c = item.dataset.color;
-  item.classList.remove('checked','checked-gr','checked-rd');
-  if (val) item.classList.add(c === 'gr' ? 'checked-gr' : c === 'rd' ? 'checked-rd' : 'checked');
+function applyPreset(name){
+  const p=PRESETS[name]||{};
+  ['enableCatalog','enableMeta','enableStreams','enableSubtitles','enableSearch'].forEach(id=>setCheck(id,true));
+  ['forceHttpsStreams','stripTorrents','stripMagnetStreams','stripAdultFlag','stripP2PFlag','offlineCache','removeTrailers','removeHeavyArtwork','removeDuplicateStreams'].forEach(id=>setCheck(id,false));
+  if('catalogCacheTtl' in p) document.getElementById('catalogCacheTtl').value=p.catalogCacheTtl;
+  if('metaCacheTtl' in p) document.getElementById('metaCacheTtl').value=p.metaCacheTtl;
+  if('streamCacheTtl' in p) document.getElementById('streamCacheTtl').value=p.streamCacheTtl;
+  if('subtitleCacheTtl' in p) document.getElementById('subtitleCacheTtl').value=p.subtitleCacheTtl;
+  Object.entries(p).forEach(([k,v])=>{ if(typeof v==='boolean') setCheck(k,v); });
+  if(name==='lite'){ setCheck('enableCatalog',false); setCheck('enableSubtitles',false); }
 }
 
 // ─── Manifest preview ─────────────────────────────────────────────────────────
-let previewTimer = null, lastPreviewUrl = '';
-
-function onManifestUrlChange() {
-  clearTimeout(previewTimer);
-  previewTimer = setTimeout(previewManifest, 800);
+let previewTimer=null, lastPreviewUrl='';
+function onManifestUrlChange(){ clearTimeout(previewTimer); previewTimer=setTimeout(previewManifest,800); }
+async function previewManifest(){
+  const url=document.getElementById('manifestUrl').value.trim();
+  if(!url||url===lastPreviewUrl) return; lastPreviewUrl=url;
+  const card=document.getElementById('preview-card'),inner=document.getElementById('preview-inner');
+  card.classList.add('show'); inner.innerHTML='<div class="preview-loading">⏳ Validating upstream…</div>';
+  try{ const r=await fetch('/api/preview',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({upstreamManifestUrl:url})});
+    renderPreview(await r.json(),inner,'typeGrid'); }
+  catch(e){ inner.innerHTML=`<div class="preview-err">⚠ ${esc(e.message)}</div>`; }
 }
-
-async function previewManifest() {
-  const url = document.getElementById('manifestUrl').value.trim();
-  if (!url || url === lastPreviewUrl) return;
-  lastPreviewUrl = url;
-  const card = document.getElementById('preview-card'), inner = document.getElementById('preview-inner');
-  card.classList.add('show'); inner.innerHTML = '<div class="preview-loading">⏳ Validating upstream…</div>';
-  try {
-    const r = await fetch('/api/preview', { method:'POST', headers:{'Content-Type':'application/json'}, body: JSON.stringify({ upstreamManifestUrl: url }) });
-    renderPreview(await r.json(), inner, 'typeGrid');
-  } catch(e) { inner.innerHTML = `<div class="preview-err">⚠ ${esc(e.message)}</div>`; }
+function onEditManifestChange(){ clearTimeout(previewTimer); previewTimer=setTimeout(previewEditManifest,800); }
+async function previewEditManifest(){
+  const url=document.getElementById('editManifestUrl').value.trim(); if(!url) return;
+  const card=document.getElementById('preview-card2'),inner=document.getElementById('preview-inner2');
+  card.classList.add('show'); inner.innerHTML='<div class="preview-loading">⏳ Validating…</div>';
+  try{ const r=await fetch('/api/preview',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({upstreamManifestUrl:url})});
+    renderPreview(await r.json(),inner,null); }
+  catch(e){ inner.innerHTML=`<div class="preview-err">⚠ ${esc(e.message)}</div>`; }
 }
-
-function onEditManifestChange() { clearTimeout(previewTimer); previewTimer = setTimeout(previewEditManifest, 800); }
-
-async function previewEditManifest() {
-  const url = document.getElementById('editManifestUrl').value.trim();
-  if (!url) return;
-  const card = document.getElementById('preview-card2'), inner = document.getElementById('preview-inner2');
-  card.classList.add('show'); inner.innerHTML = '<div class="preview-loading">⏳ Validating…</div>';
-  try {
-    const r = await fetch('/api/preview', { method:'POST', headers:{'Content-Type':'application/json'}, body: JSON.stringify({ upstreamManifestUrl: url }) });
-    renderPreview(await r.json(), inner, null);
-  } catch(e) { inner.innerHTML = `<div class="preview-err">⚠ ${esc(e.message)}</div>`; }
-}
-
-function renderPreview(data, inner, typeGridId) {
-  const v = data.validation, m = data.raw || {};
-  let html = '';
-  if (v.valid) {
-    html += `<div class="preview-name">${esc(m.name||'?')}</div><div class="preview-id">${esc(m.id||'')} · v${esc(m.version||'?')}</div>`;
-    html += '<div class="preview-tags">';
-    v.resources.forEach(r => html += `<span class="preview-tag tag-resource">${r}</span>`);
-    v.types.forEach(t => html += `<span class="preview-tag tag-type">${t}</span>`);
-    if ((m.behaviorHints||{}).adult) html += '<span class="preview-tag tag-warn">Adult</span>';
-    if ((m.behaviorHints||{}).p2p)   html += '<span class="preview-tag tag-warn">P2P</span>';
-    html += '</div>';
-  } else { html = `<div class="preview-name" style="color:var(--red)">Validation Failed</div>`; }
-  if (v.errors.length) { html += '<div style="margin-top:6px">'; v.errors.forEach(e => html += `<div class="preview-err">✕ ${esc(e)}</div>`); html += '</div>'; }
-  if (v.warnings.length) { html += '<div style="margin-top:4px">'; v.warnings.forEach(w => html += `<div class="preview-warn">⚠ ${esc(w)}</div>`); html += '</div>'; }
-  inner.innerHTML = html;
-  if (typeGridId && v.valid && v.types.length) {
-    const grid = document.getElementById(typeGridId);
-    const known = new Set([...grid.querySelectorAll('.type-pill')].map(p=>p.dataset.type));
-    v.types.forEach(t => { if (!known.has(t)) grid.insertAdjacentHTML('beforeend',`<div class="type-pill" data-type="${esc(t)}" onclick="toggleType(this)">${esc(t)}</div>`); });
-    grid.querySelectorAll('.type-pill').forEach(pill => {
-      const avail = v.types.includes(pill.dataset.type);
-      pill.style.opacity = avail ? '1' : '0.35';
-      pill.style.pointerEvents = avail ? '' : 'none';
-      if (!avail) pill.classList.remove('selected');
+function renderPreview(data,inner,typeGridId){
+  const v=data.validation,m=data.raw||{};
+  let html='';
+  if(v.valid){
+    html+=`<div class="preview-name">${esc(m.name||'?')}</div><div class="preview-id">${esc(m.id||'')} · v${esc(m.version||'?')}</div>`;
+    html+='<div class="preview-tags">';
+    v.resources.forEach(r=>html+=`<span class="preview-tag tag-resource">${r}</span>`);
+    v.types.forEach(t=>html+=`<span class="preview-tag tag-type">${t}</span>`);
+    if((m.behaviorHints||{}).adult) html+='<span class="preview-tag tag-warn">Adult</span>';
+    if((m.behaviorHints||{}).p2p)   html+='<span class="preview-tag tag-warn">P2P</span>';
+    html+='</div>';
+  } else { html=`<div class="preview-name" style="color:var(--red)">Validation Failed</div>`; }
+  if(v.errors.length){ html+='<div style="margin-top:6px">'; v.errors.forEach(e=>html+=`<div class="preview-err">✕ ${esc(e)}</div>`); html+='</div>'; }
+  if(v.warnings.length){ html+='<div style="margin-top:4px">'; v.warnings.forEach(w=>html+=`<div class="preview-warn">⚠ ${esc(w)}</div>`); html+='</div>'; }
+  inner.innerHTML=html;
+  if(typeGridId&&v.valid&&v.types.length){
+    const grid=document.getElementById(typeGridId);
+    const known=new Set([...grid.querySelectorAll('.type-pill')].map(p=>p.dataset.type));
+    v.types.forEach(t=>{ if(!known.has(t)) grid.insertAdjacentHTML('beforeend',`<div class="type-pill" data-type="${esc(t)}" onclick="toggleType(this)">${esc(t)}</div>`); });
+    grid.querySelectorAll('.type-pill').forEach(pill=>{
+      const avail=v.types.includes(pill.dataset.type);
+      pill.style.opacity=avail?'1':'0.35'; pill.style.pointerEvents=avail?'':'none';
+      if(!avail) pill.classList.remove('selected');
     });
   }
 }
 
-// ─── Build payload from form ──────────────────────────────────────────────────
-function buildPayload() {
-  const subtitleLanguages = document.getElementById('subtitleLanguages').value
-    .split(',').map(s=>s.trim().toLowerCase()).filter(s=>/^[a-z]{2,3}$/.test(s));
-  const idPrefixFilter = document.getElementById('idPrefixFilter').value
-    .split(',').map(s=>s.trim()).filter(Boolean);
-  const allowedGenres = document.getElementById('allowedGenres').value
-    .split(',').map(s=>s.trim().toLowerCase()).filter(Boolean);
-
-  return {
+// ─── Build proxy payload ──────────────────────────────────────────────────────
+function buildPayload(){
+  const subtitleLanguages=document.getElementById('subtitleLanguages').value.split(',').map(s=>s.trim().toLowerCase()).filter(s=>/^[a-z]{2,3}$/.test(s));
+  const idPrefixFilter=document.getElementById('idPrefixFilter').value.split(',').map(s=>s.trim()).filter(Boolean);
+  const allowedGenres=document.getElementById('allowedGenres').value.split(',').map(s=>s.trim().toLowerCase()).filter(Boolean);
+  return{
     upstreamManifestUrl:   document.getElementById('manifestUrl').value.trim(),
     posterUrl:             document.getElementById('posterUrl').value.trim(),
     logoUrl:               document.getElementById('logoUrl').value.trim(),
@@ -853,137 +966,426 @@ function buildPayload() {
   };
 }
 
-// ─── Create proxy ──────────────────────────────────────────────────────────────
-async function createProxy() {
+// ─── Create proxy ─────────────────────────────────────────────────────────────
+async function createProxy(){
   clearError();
-  const url = document.getElementById('manifestUrl').value.trim();
-  if (!url) return showError('Please enter the upstream manifest URL.');
-  const pw  = document.getElementById('proxyPassword').value;
-  const pw2 = document.getElementById('proxyPasswordConfirm').value;
-  if (!pw || pw.length < 4) return showError('Password must be at least 4 characters.');
-  if (pw !== pw2) return showError('Passwords do not match.');
-
-  const payload = { ...buildPayload(), password: pw };
-  const btn = document.getElementById('createBtn');
-  btn.dataset.orig = 'Generate Proxy Addon';
-  setLoading('createBtn', true, 'Creating proxy…');
-  try {
-    const r = await fetch('/api/create', { method:'POST', headers:{'Content-Type':'application/json'}, body: JSON.stringify(payload) });
-    const d = await r.json();
-    if (!r.ok) return showError(d.error || `Server error ${r.status}`, d.details);
-    document.getElementById('resManifest').textContent  = d.manifestUrl;
-    document.getElementById('resStremio').textContent   = d.stremioUrl;
-    document.getElementById('resConfigure').textContent = d.configureUrl;
-    document.getElementById('installLink').href = d.stremioUrl;
+  const url=document.getElementById('manifestUrl').value.trim();
+  if(!url) return showError('Please enter the upstream manifest URL.');
+  const pw=document.getElementById('proxyPassword').value;
+  const pw2=document.getElementById('proxyPasswordConfirm').value;
+  if(!pw||pw.length<4) return showError('Password must be at least 4 characters.');
+  if(pw!==pw2) return showError('Passwords do not match.');
+  const payload={...buildPayload(),password:pw};
+  document.getElementById('createBtn').dataset.orig='Generate Proxy Addon';
+  setLoading('createBtn',true,'Creating proxy…');
+  try{
+    const r=await fetch('/api/create',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(payload)});
+    const d=await r.json();
+    if(!r.ok) return showError(d.error||`Server error ${r.status}`,d.details);
+    document.getElementById('resManifest').textContent=d.manifestUrl;
+    document.getElementById('resStremio').textContent=d.stremioUrl;
+    document.getElementById('resConfigure').textContent=d.configureUrl;
+    document.getElementById('installLink').href=d.stremioUrl;
     document.getElementById('result').classList.add('visible');
-    document.getElementById('result').scrollIntoView({ behavior:'smooth', block:'nearest' });
-  } catch(e) { showError('Network error — is the worker deployed?'); }
-  finally { setLoading('createBtn', false); }
+    document.getElementById('result').scrollIntoView({behavior:'smooth',block:'nearest'});
+  } catch(e){ showError('Network error — is the worker deployed?'); }
+  finally{ setLoading('createBtn',false); }
 }
 
-// ─── Edit proxy: load ──────────────────────────────────────────────────────────
-let currentEditId = '';
-let currentEditPw = '';
+// ─── Edit tab: unified load ───────────────────────────────────────────────────
+let currentEditType=''; // 'proxy' | 'profileset'
+let currentEditId='';
+let currentEditPw='';
 
-async function loadProxyForEdit() {
-  const id = document.getElementById('editProxyId').value.trim();
-  const pw = document.getElementById('editPassword').value;
-  const errEl = document.getElementById('loadError');
-  errEl.style.display = 'none';
-  if (!id || !pw) { errEl.textContent = 'Please enter both proxy ID and password.'; errEl.style.display='block'; return; }
+async function loadConfigForEdit(){
+  const id=document.getElementById('editProxyId').value.trim();
+  const pw=document.getElementById('editPassword').value;
+  const errEl=document.getElementById('loadError');
+  errEl.style.display='none';
+  if(!id||!pw){ errEl.textContent='Please enter both ID and password.'; errEl.style.display='block'; return; }
 
-  const r = await fetch(`/api/config/${id}`, { headers: { Authorization: `Bearer ${pw}` } });
-  if (!r.ok) { const d = await r.json(); errEl.textContent = d.error || 'Failed to load config'; errEl.style.display='block'; return; }
-  const cfg = await r.json();
-  currentEditId = id; currentEditPw = pw;
+  // Try proxy first
+  let r=await fetch(`/api/config/${id}`,{headers:{Authorization:`Bearer ${pw}`}});
+  if(r.ok){
+    const cfg=await r.json();
+    currentEditType='proxy'; currentEditId=id; currentEditPw=pw;
+    fillProxyEditForm(cfg);
+    document.getElementById('loadBox').style.display='none';
+    document.getElementById('editProxyForm').style.display='block';
+    document.getElementById('editPSForm').style.display='none';
+    const banner=document.getElementById('editBanner');
+    banner.textContent=`✏ Editing proxy — ${id.slice(0,8)}… (cache v${cfg.cacheGeneration})`;
+    banner.classList.add('show');
+    return;
+  }
+  if(r.status!==404){ const d=await r.json().catch(()=>({})); errEl.textContent=d.error||'Failed to load'; errEl.style.display='block'; return; }
 
-  // Fill edit form
-  document.getElementById('editManifestUrl').value    = cfg.upstreamBaseUrl || '';
-  document.getElementById('ePosterUrl').value          = cfg.posterUrl || '';
-  document.getElementById('eLogoUrl').value            = cfg.logoUrl || '';
-  document.getElementById('eBackgroundUrl').value      = cfg.backgroundUrl || '';
-  document.getElementById('eBannerUrl').value          = cfg.bannerUrl || '';
-  document.getElementById('eThumbnailUrl').value       = cfg.thumbnailUrl || '';
-  document.getElementById('ePosterShape').value        = cfg.posterShape || '';
-  document.getElementById('eNamePrefix').value         = cfg.namePrefix || '';
-  document.getElementById('eNameSuffix').value         = cfg.nameSuffix || '';
-  document.getElementById('eDescPrefix').value         = cfg.descriptionPrefix || '';
-  document.getElementById('eDescSuffix').value         = cfg.descriptionSuffix || '';
-  document.getElementById('eStreamSortBy').value       = cfg.streamSortBy || 'none';
-  document.getElementById('eMaxStreams').value         = cfg.maxStreams || 0;
-  document.getElementById('eStreamNamePrefix').value   = cfg.streamNamePrefix || '';
-  document.getElementById('eMinImdbRating').value      = cfg.minImdbRating || 0;
-  document.getElementById('eAllowedGenres').value      = (cfg.allowedGenres||[]).join(', ');
-  document.getElementById('eCatalogTtl').value         = cfg.catalogCacheTtl || 0;
-  document.getElementById('eMetaTtl').value            = cfg.metaCacheTtl || 0;
-  document.getElementById('eStreamTtl').value          = cfg.streamCacheTtl || 0;
-  document.getElementById('eSubtitleTtl').value        = cfg.subtitleCacheTtl || 0;
-
-  const banner = document.getElementById('editBanner');
-  banner.textContent = `✏ Editing proxy ${id} (cache generation v${cfg.cacheGeneration})`;
-  banner.classList.add('show');
-  document.getElementById('loadBox').style.display='none';
-  document.getElementById('editForm').style.display='block';
+  // Try profileset
+  r=await fetch(`/api/profilesets/${id}`,{headers:{Authorization:`Bearer ${pw}`}});
+  if(r.ok){
+    const ps=await r.json();
+    currentEditType='profileset'; currentEditId=id; currentEditPw=pw;
+    fillPSEditForm(ps);
+    document.getElementById('loadBox').style.display='none';
+    document.getElementById('editProxyForm').style.display='none';
+    document.getElementById('editPSForm').style.display='block';
+    return;
+  }
+  const d=await r.json().catch(()=>({}));
+  errEl.textContent=d.error||'Config not found — check your ID and password';
+  errEl.style.display='block';
 }
 
-async function updateProxy() {
+// ─── Proxy edit form fill ─────────────────────────────────────────────────────
+function fillProxyEditForm(cfg){
+  document.getElementById('editManifestUrl').value    =cfg.upstreamBaseUrl||'';
+  document.getElementById('ePosterUrl').value          =cfg.posterUrl||'';
+  document.getElementById('eLogoUrl').value            =cfg.logoUrl||'';
+  document.getElementById('eBackgroundUrl').value      =cfg.backgroundUrl||'';
+  document.getElementById('eBannerUrl').value          =cfg.bannerUrl||'';
+  document.getElementById('eThumbnailUrl').value       =cfg.thumbnailUrl||'';
+  document.getElementById('ePosterShape').value        =cfg.posterShape||'';
+  document.getElementById('eNamePrefix').value         =cfg.namePrefix||'';
+  document.getElementById('eNameSuffix').value         =cfg.nameSuffix||'';
+  document.getElementById('eDescPrefix').value         =cfg.descriptionPrefix||'';
+  document.getElementById('eDescSuffix').value         =cfg.descriptionSuffix||'';
+  document.getElementById('eStreamSortBy').value       =cfg.streamSortBy||'none';
+  document.getElementById('eMaxStreams').value         =cfg.maxStreams||0;
+  document.getElementById('eStreamNamePrefix').value   =cfg.streamNamePrefix||'';
+  document.getElementById('eMinImdbRating').value      =cfg.minImdbRating||0;
+  document.getElementById('eAllowedGenres').value      =(cfg.allowedGenres||[]).join(', ');
+  document.getElementById('eCatalogTtl').value         =cfg.catalogCacheTtl||0;
+  document.getElementById('eMetaTtl').value            =cfg.metaCacheTtl||0;
+  document.getElementById('eStreamTtl').value          =cfg.streamCacheTtl||0;
+  document.getElementById('eSubtitleTtl').value        =cfg.subtitleCacheTtl||0;
+}
+
+async function updateProxy(){
   clearError('2');
-  const eu = document.getElementById('editManifestUrl').value.trim();
-  const allowedGenres = document.getElementById('eAllowedGenres').value.split(',').map(s=>s.trim().toLowerCase()).filter(Boolean);
-  const payload = {
-    upstreamBaseUrl:      eu,
-    posterUrl:            document.getElementById('ePosterUrl').value.trim(),
-    logoUrl:              document.getElementById('eLogoUrl').value.trim(),
-    backgroundUrl:        document.getElementById('eBackgroundUrl').value.trim(),
-    bannerUrl:            document.getElementById('eBannerUrl').value.trim(),
-    thumbnailUrl:         document.getElementById('eThumbnailUrl').value.trim(),
-    posterShape:          document.getElementById('ePosterShape').value,
-    namePrefix:           document.getElementById('eNamePrefix').value,
-    nameSuffix:           document.getElementById('eNameSuffix').value,
-    descriptionPrefix:    document.getElementById('eDescPrefix').value,
-    descriptionSuffix:    document.getElementById('eDescSuffix').value,
-    streamSortBy:         document.getElementById('eStreamSortBy').value,
-    maxStreams:           Number(document.getElementById('eMaxStreams').value)||0,
-    streamNamePrefix:     document.getElementById('eStreamNamePrefix').value,
-    minImdbRating:        Number(document.getElementById('eMinImdbRating').value)||0,
+  const eu=document.getElementById('editManifestUrl').value.trim();
+  const allowedGenres=document.getElementById('eAllowedGenres').value.split(',').map(s=>s.trim().toLowerCase()).filter(Boolean);
+  const payload={
+    upstreamBaseUrl:   eu,
+    posterUrl:         document.getElementById('ePosterUrl').value.trim(),
+    logoUrl:           document.getElementById('eLogoUrl').value.trim(),
+    backgroundUrl:     document.getElementById('eBackgroundUrl').value.trim(),
+    bannerUrl:         document.getElementById('eBannerUrl').value.trim(),
+    thumbnailUrl:      document.getElementById('eThumbnailUrl').value.trim(),
+    posterShape:       document.getElementById('ePosterShape').value,
+    namePrefix:        document.getElementById('eNamePrefix').value,
+    nameSuffix:        document.getElementById('eNameSuffix').value,
+    descriptionPrefix: document.getElementById('eDescPrefix').value,
+    descriptionSuffix: document.getElementById('eDescSuffix').value,
+    streamSortBy:      document.getElementById('eStreamSortBy').value,
+    maxStreams:        Number(document.getElementById('eMaxStreams').value)||0,
+    streamNamePrefix:  document.getElementById('eStreamNamePrefix').value,
+    minImdbRating:     Number(document.getElementById('eMinImdbRating').value)||0,
     allowedGenres,
-    catalogCacheTtl:      Number(document.getElementById('eCatalogTtl').value)||0,
-    metaCacheTtl:         Number(document.getElementById('eMetaTtl').value)||0,
-    streamCacheTtl:       Number(document.getElementById('eStreamTtl').value)||0,
-    subtitleCacheTtl:     Number(document.getElementById('eSubtitleTtl').value)||0,
+    catalogCacheTtl:   Number(document.getElementById('eCatalogTtl').value)||0,
+    metaCacheTtl:      Number(document.getElementById('eMetaTtl').value)||0,
+    streamCacheTtl:    Number(document.getElementById('eStreamTtl').value)||0,
+    subtitleCacheTtl:  Number(document.getElementById('eSubtitleTtl').value)||0,
   };
-
-  const btn = document.getElementById('updateBtn');
-  btn.dataset.orig = 'Update Proxy';
-  setLoading('updateBtn', true, 'Saving…');
-  try {
-    const r = await fetch(`/api/config/${currentEditId}`, { method:'PUT', headers:{'Content-Type':'application/json','Authorization':`Bearer ${currentEditPw}`}, body: JSON.stringify(payload) });
-    const d = await r.json();
-    if (!r.ok) return showError(d.error || `Server error ${r.status}`, d.details, '2');
-    document.getElementById('resManifest2').textContent = d.manifestUrl;
-    document.getElementById('resStremio2').textContent  = d.stremioUrl;
-    document.getElementById('installLink2').href = d.stremioUrl;
+  document.getElementById('updateBtn').dataset.orig='Update Proxy';
+  setLoading('updateBtn',true,'Saving…');
+  try{
+    const r=await fetch(`/api/config/${currentEditId}`,{method:'PUT',headers:{'Content-Type':'application/json','Authorization':`Bearer ${currentEditPw}`},body:JSON.stringify(payload)});
+    const d=await r.json();
+    if(!r.ok) return showError(d.error||`Server error ${r.status}`,d.details,'2');
+    document.getElementById('resManifest2').textContent=d.manifestUrl;
+    document.getElementById('resStremio2').textContent=d.stremioUrl;
+    document.getElementById('installLink2').href=d.stremioUrl;
     document.getElementById('result2').classList.add('visible');
-    document.getElementById('result2').scrollIntoView({ behavior:'smooth', block:'nearest' });
-    document.getElementById('editBanner').textContent = `✅ Proxy updated & cache flushed! (cache auto-incremented)`;
-  } catch(e) { showError('Network error', '', '2'); }
-  finally { setLoading('updateBtn', false); }
+    document.getElementById('result2').scrollIntoView({behavior:'smooth',block:'nearest'});
+    document.getElementById('editBanner').textContent='✅ Proxy updated & cache flushed!';
+  } catch(e){ showError('Network error','','2'); }
+  finally{ setLoading('updateBtn',false); }
 }
 
-async function flushProxyCache() {
-  if (!currentEditId) return;
-  const r = await fetch(`/api/flush/${currentEditId}`, { method:'POST', headers:{ Authorization:`Bearer ${currentEditPw}` } });
-  const d = await r.json();
-  if (r.ok) alert(`Cache flushed! New generation: v${d.generation}`);
-  else alert('Error: ' + (d.error||'unknown'));
+async function flushProxyCache(){
+  if(!currentEditId) return;
+  const r=await fetch(`/api/flush/${currentEditId}`,{method:'POST',headers:{Authorization:`Bearer ${currentEditPw}`}});
+  const d=await r.json();
+  if(r.ok) alert(`Cache flushed! New generation: v${d.generation}`);
+  else alert('Error: '+(d.error||'unknown'));
 }
 
-async function deleteProxy() {
-  if (!confirm(`Delete proxy ${currentEditId}? This cannot be undone.`)) return;
-  const r = await fetch(`/api/config/${currentEditId}`, { method:'DELETE', headers:{ Authorization:`Bearer ${currentEditPw}` } });
-  if (r.ok) { document.getElementById('editForm').style.display='none'; document.getElementById('loadBox').style.display='block'; alert('Proxy deleted.'); }
-  else { const d = await r.json(); alert('Error: '+(d.error||'unknown')); }
+async function deleteProxy(){
+  if(!confirm(`Delete proxy ${currentEditId}? This cannot be undone.`)) return;
+  const r=await fetch(`/api/config/${currentEditId}`,{method:'DELETE',headers:{Authorization:`Bearer ${currentEditPw}`}});
+  if(r.ok){
+    document.getElementById('editProxyForm').style.display='none';
+    document.getElementById('loadBox').style.display='block';
+    document.getElementById('editBanner').classList.remove('show');
+    alert('Proxy deleted.');
+  } else { const d=await r.json(); alert('Error: '+(d.error||'unknown')); }
 }
+
+// ═══════════════════════════════════════════════════════════════════════════════
+// ─── PROFILE SET ENGINE ────────────────────────────────────────────────────────
+// ═══════════════════════════════════════════════════════════════════════════════
+
+const COLOR_PRESETS=['#e8a428','#f5c156','#27ae60','#2980b9','#c0392b','#8e44ad','#16a085','#e67e22'];
+
+const POPULAR_ADDONS=[
+  {name:'Cinemeta',    url:'https://v3-cinemeta.strem.io/manifest.json'},
+  {name:'OpenSubs',    url:'https://opensubtitles-v3.strem.io/manifest.json'},
+  {name:'Test Addon',  url:location.origin+'/proxy/test/manifest.json'},
+];
+
+// Two independent profile arrays — one for Create tab, one for Edit tab
+let psCreateProfiles=[];
+let psEditProfiles=[];
+// Track active profile ID when editing (to show badge)
+let psEditActiveId='';
+
+function getArr(cid){ return cid.includes('edit')?psEditProfiles:psCreateProfiles; }
+
+function newProfile(){
+  return {
+    _id: Math.random().toString(36).slice(2,10),
+    name:'', icon:'⭐', color:'#e8a428',
+    addons:[{url:'',label:''}]
+  };
+}
+
+// ─── Render the full profile list into a container ────────────────────────────
+function renderProfiles(cid){
+  const el=document.getElementById(cid); if(!el) return;
+  const arr=getArr(cid);
+
+  if(arr.length===0){
+    el.innerHTML=`<div class="empty-profiles-hint">No profiles yet — click "+ Add Profile" to get started.</div>`+
+      `<button class="add-profile-btn" onclick="psAddProfile('${escA(cid)}')">+ Add Profile</button>`;
+    return;
+  }
+
+  const rows=arr.map((p,pi)=>{
+    const isActive = cid.includes('edit') && p._id===psEditActiveId;
+    const swatches=COLOR_PRESETS.map(c=>
+      `<div class="color-swatch${c===p.color?' active':''}" style="background:${c}" title="${c}" onclick="psSetColor('${escA(cid)}',${pi},'${c}')"></div>`
+    ).join('');
+    const addonRows=p.addons.map((a,ai)=>
+      `<div class="addon-row">
+        <input type="url" class="ps-inp ps-inp-mono addon-row-url" value="${escA(a.url)}"
+               placeholder="https://addon.example.com/manifest.json"
+               oninput="psAddonUpdate('${escA(cid)}',${pi},${ai},'url',this.value)" />
+        <input type="text" class="ps-inp addon-row-label" value="${escA(a.label)}"
+               placeholder="Label (opt.)"
+               oninput="psAddonUpdate('${escA(cid)}',${pi},${ai},'label',this.value)" />
+        <button class="addon-remove-btn" onclick="psRemoveAddon('${escA(cid)}',${pi},${ai})" title="Remove addon">✕</button>
+      </div>`
+    ).join('');
+    const quickChips=POPULAR_ADDONS.map(a=>
+      `<span class="quick-chip" onclick="psQuickAdd('${escA(cid)}',${pi},'${escA(a.url)}','${escA(a.name)}')">${esc(a.name)}</span>`
+    ).join('');
+    return `<div class="profile-card">
+      <div class="profile-card-header">
+        <div class="profile-icon-badge" id="${escA(cid)}-badge-${pi}" style="background:${p.color}">${esc(p.icon||'⭐')}</div>
+        <input type="text" class="ps-inp ps-inp-name" value="${escA(p.name)}"
+               placeholder="Profile name (e.g. Work, Kids)"
+               oninput="psFieldUpdate('${escA(cid)}',${pi},'name',this.value)" />
+        <input type="text" class="ps-inp ps-inp-icon" value="${escA(p.icon)}" maxlength="2" placeholder="⭐"
+               oninput="psFieldUpdate('${escA(cid)}',${pi},'icon',this.value);psUpdateBadge('${escA(cid)}',${pi})" />
+        <div class="color-swatches">${swatches}</div>
+        ${isActive?'<span class="active-badge">Active</span>':''}
+        <button class="profile-remove-btn" onclick="psRemoveProfile('${escA(cid)}',${pi})">✕ Remove</button>
+      </div>
+      <div class="ps-addon-section-label">Addons${p.addons.length>0?' ('+p.addons.filter(a=>a.url.trim()).length+' set)':''}</div>
+      ${addonRows}
+      <button class="add-addon-btn" onclick="psAddAddon('${escA(cid)}',${pi})">+ Add Addon</button>
+      <div class="quick-addons">
+        <span style="font-size:10px;color:var(--muted);letter-spacing:.06em;text-transform:uppercase">Quick add:</span>
+        ${quickChips}
+      </div>
+    </div>`;
+  }).join('');
+
+  el.innerHTML=rows+`<button class="add-profile-btn" onclick="psAddProfile('${escA(cid)}')">+ Add Profile</button>`;
+}
+
+// ─── Profile state mutations ──────────────────────────────────────────────────
+function psFieldUpdate(cid,pi,field,value){
+  const arr=getArr(cid); if(arr[pi]) arr[pi][field]=value;
+}
+function psUpdateBadge(cid,pi){
+  const arr=getArr(cid); if(!arr[pi]) return;
+  const badge=document.getElementById(`${cid}-badge-${pi}`);
+  if(badge){ badge.textContent=arr[pi].icon||'⭐'; }
+}
+function psSetColor(cid,pi,color){
+  const arr=getArr(cid); if(!arr[pi]) return;
+  arr[pi].color=color;
+  renderProfiles(cid);
+}
+function psAddProfile(cid){
+  getArr(cid).push(newProfile());
+  renderProfiles(cid);
+  // Scroll to new card
+  setTimeout(()=>{
+    const cards=document.querySelectorAll(`#${cid} .profile-card`);
+    if(cards.length) cards[cards.length-1].scrollIntoView({behavior:'smooth',block:'nearest'});
+  },50);
+}
+function psRemoveProfile(cid,pi){
+  const arr=getArr(cid);
+  if(arr.length<=1){ alert('Keep at least one profile.'); return; }
+  arr.splice(pi,1);
+  renderProfiles(cid);
+}
+function psAddonUpdate(cid,pi,ai,field,value){
+  const arr=getArr(cid);
+  if(arr[pi]?.addons[ai]) arr[pi].addons[ai][field]=value;
+}
+function psAddAddon(cid,pi){
+  const arr=getArr(cid);
+  if(!arr[pi]) return;
+  arr[pi].addons.push({url:'',label:''});
+  renderProfiles(cid);
+  // Focus the new URL input
+  setTimeout(()=>{
+    const rows=document.querySelectorAll(`#${cid} .profile-card`)[pi]?.querySelectorAll('.addon-row');
+    if(rows?.length) rows[rows.length-1].querySelector('input[type="url"]')?.focus();
+  },50);
+}
+function psRemoveAddon(cid,pi,ai){
+  const arr=getArr(cid);
+  if(!arr[pi]||arr[pi].addons.length<=1){ alert('Keep at least one addon slot per profile.'); return; }
+  arr[pi].addons.splice(ai,1);
+  renderProfiles(cid);
+}
+function psQuickAdd(cid,pi,url,label){
+  const arr=getArr(cid); if(!arr[pi]) return;
+  const exists=arr[pi].addons.some(a=>a.url===url);
+  if(exists) return;
+  const last=arr[pi].addons[arr[pi].addons.length-1];
+  if(last&&!last.url.trim()){ last.url=url; last.label=label; }
+  else arr[pi].addons.push({url,label});
+  renderProfiles(cid);
+}
+
+// ─── Create Profile Set ───────────────────────────────────────────────────────
+async function createProfileSet(){
+  clearPSError();
+  const name=document.getElementById('psName').value.trim();
+  if(!name) return showPSError('Please enter a name for your profile set.');
+  const pw=document.getElementById('psPassword').value;
+  if(!pw||pw.length<4) return showPSError('Password must be at least 4 characters.');
+  if(psCreateProfiles.length===0) return showPSError('Add at least one profile.');
+
+  const profiles=psCreateProfiles.map(p=>({
+    name: p.name||'Profile',
+    icon: p.icon||'⭐',
+    color: p.color||'#e8a428',
+    addons: p.addons.filter(a=>a.url.trim()).map(a=>({url:a.url.trim(),label:a.label.trim()||undefined}))
+  })).filter(p=>p.addons.length>0||p.name.trim());
+
+  if(profiles.length===0) return showPSError('Add at least one addon URL to a profile.');
+
+  document.getElementById('psCreateBtn').dataset.orig='Create Profile Set Addon';
+  setLoading('psCreateBtn',true,'Creating…');
+  try{
+    const r=await fetch('/api/profilesets/create',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({name,password:pw,profiles})});
+    const d=await r.json();
+    if(!r.ok) return showPSError(d.error||`Server error ${r.status}`);
+    document.getElementById('ps-res-manifest').textContent=d.manifestUrl;
+    document.getElementById('ps-res-stremio').textContent=d.stremioUrl;
+    document.getElementById('ps-res-configure').textContent=d.configureUrl;
+    document.getElementById('ps-install-link').href=d.stremioUrl;
+    document.getElementById('ps-result').classList.add('visible');
+    document.getElementById('ps-result').scrollIntoView({behavior:'smooth',block:'nearest'});
+  } catch(e){ showPSError('Network error — is the worker deployed?'); }
+  finally{ setLoading('psCreateBtn',false); }
+}
+
+// ─── Profile Set edit form fill ───────────────────────────────────────────────
+function fillPSEditForm(ps){
+  document.getElementById('ePSName').value=ps.name||'';
+  psEditActiveId=ps.activeProfileId||'';
+
+  psEditProfiles=(ps.profiles||[]).map(p=>({
+    _id: p.id||Math.random().toString(36).slice(2,10),
+    name: p.name||'',
+    icon: p.icon||'⭐',
+    color: p.color||'#e8a428',
+    addons: (p.addons||[]).map(a=>({
+      url: a.manifestUrl||a.url||'',
+      label: a.label||''
+    }))
+  }));
+
+  if(psEditProfiles.length===0) psEditProfiles.push(newProfile());
+  renderProfiles('ps-edit-profiles');
+
+  const banner=document.getElementById('editBanner');
+  const activeProfile=psEditProfiles.find(p=>p._id===psEditActiveId);
+  banner.textContent=`✏ Editing "${ps.name}" — ${psEditProfiles.length} profile${psEditProfiles.length!==1?'s':''} · Active: ${activeProfile?.name||'none'} · cache v${ps.cacheGeneration}`;
+  banner.classList.add('show');
+}
+
+// ─── Update Profile Set ───────────────────────────────────────────────────────
+async function updateProfileSet(){
+  const errEl=document.getElementById('ps-edit-error');
+  errEl.classList.remove('visible');
+
+  const name=document.getElementById('ePSName').value.trim();
+  if(!name){ errEl.innerHTML='Name is required.'; errEl.classList.add('visible'); return; }
+
+  const profiles=psEditProfiles.map(p=>({
+    id: p._id, // preserve existing IDs so activeProfileId stays valid
+    name: p.name||'Profile',
+    icon: p.icon||'⭐',
+    color: p.color||'#e8a428',
+    addons: p.addons.filter(a=>a.url.trim()).map(a=>({url:a.url.trim(),label:a.label.trim()||undefined}))
+  }));
+
+  document.getElementById('ePSUpdateBtn').dataset.orig='Save Profile Set';
+  setLoading('ePSUpdateBtn',true,'Saving…');
+  try{
+    const r=await fetch(`/api/profilesets/${currentEditId}`,{
+      method:'PUT',
+      headers:{'Content-Type':'application/json','Authorization':`Bearer ${currentEditPw}`},
+      body:JSON.stringify({name,profiles})
+    });
+    const d=await r.json();
+    if(!r.ok){ errEl.innerHTML=esc(d.error||`Server error ${r.status}`); errEl.classList.add('visible'); return; }
+    document.getElementById('ps-edit-res-manifest').textContent=d.manifestUrl;
+    document.getElementById('ps-edit-install-link').href=d.stremioUrl;
+    document.getElementById('ps-edit-result').classList.add('visible');
+    document.getElementById('ps-edit-result').scrollIntoView({behavior:'smooth',block:'nearest'});
+    document.getElementById('editBanner').textContent=`✅ Profile Set saved! Cache invalidated — Stremio will pick up changes.`;
+  } catch(e){ errEl.innerHTML='Network error.'; errEl.classList.add('visible'); }
+  finally{ setLoading('ePSUpdateBtn',false); }
+}
+
+async function flushPSCache(){
+  if(!currentEditId) return;
+  const r=await fetch(`/api/flush/${currentEditId}`,{method:'POST',headers:{Authorization:`Bearer ${currentEditPw}`}});
+  const d=await r.json().catch(()=>({}));
+  if(r.ok) alert(`Cache flushed! Generation: v${d.generation}`);
+  else alert('Error: '+(d.error||'unknown'));
+}
+
+async function deleteProfileSet(){
+  if(!confirm(`Delete this profile set (${currentEditId})? Cannot be undone.`)) return;
+  const r=await fetch(`/api/profilesets/${currentEditId}`,{method:'DELETE',headers:{Authorization:`Bearer ${currentEditPw}`}});
+  if(r.ok){
+    document.getElementById('editPSForm').style.display='none';
+    document.getElementById('loadBox').style.display='block';
+    document.getElementById('editBanner').classList.remove('show');
+    alert('Profile set deleted.');
+  } else { const d=await r.json().catch(()=>({})); alert('Error: '+(d.error||'unknown')); }
+}
+
+// ─── Boot: initialize empty profile lists ────────────────────────────────────
+(function init(){
+  // Seed create tab with two example profiles
+  psCreateProfiles=[
+    {_id:Math.random().toString(36).slice(2,10), name:'Work',  icon:'💼', color:'#2980b9', addons:[{url:'',label:''}]},
+    {_id:Math.random().toString(36).slice(2,10), name:'Kids',  icon:'👶', color:'#27ae60', addons:[{url:'',label:''}]},
+  ];
+  renderProfiles('ps-profiles');
+})();
 </script>
 </body>
 </html>
