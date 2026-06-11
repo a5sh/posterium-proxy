@@ -1,6 +1,12 @@
-// src/index.ts — PosteriumProxy v4 (FIXED)
-// Adds: Multi-profile aggregator addon, /test static test profiles,
-//       unified /{uuid} routing (proxy + profileset), full stream/meta aggregation
+// src/index.ts — PosteriumProxy v4
+// KEY CHANGE: handlePSManifest now includes ALL profiles' catalogs in the manifest
+// (not just the active profile's). This keeps the manifest structurally stable so
+// Stremio never prompts for a reinstall when switching profiles.
+//
+// Theory verified here: Stremio hides catalogs that return 0 items.
+// Active profile → catalog returns items → visible in Stremio.
+// Inactive profile → catalog returns [] → hidden by Stremio.
+// Result: seamless profile switching with a single installed addon URL.
 
 export interface Env {
   PROXY_CONFIGS: KVNamespace;
@@ -8,7 +14,7 @@ export interface Env {
   ADMIN_PASSWORD?: string;
 }
 
-// ─── Constants ──────────────────────────────────────────────────────────────────
+// ─── Constants ───────────────────────────────────────────────────────────────
 
 const DEFAULT_ADMIN_PW    = "admin123";
 const VALID_RESOURCES     = new Set(["catalog","meta","stream","subtitles","addon_catalog"]);
@@ -22,7 +28,7 @@ const DEF_META_TTL     = 86400;
 const DEF_STREAM_TTL   = 300;
 const DEF_SUBTITLE_TTL = 3600;
 
-// ─── ProfileSet types ────────────────────────────────────────────────────────────
+// ─── ProfileSet types ─────────────────────────────────────────────────────────
 
 interface CachedManifest {
   name?:        string;
@@ -60,7 +66,7 @@ interface ProfileSet {
   updatedAt:       number;
 }
 
-// ─── Proxy types ─────────────────────────────────────────────────────────────────
+// ─── Proxy types ──────────────────────────────────────────────────────────────
 
 interface ProxyConfig {
   id:               string;
@@ -117,7 +123,7 @@ interface ProxyConfig {
   updatedAt: number;
 }
 
-// ─── Stremio types ────────────────────────────────────────────────────────────────
+// ─── Stremio types ────────────────────────────────────────────────────────────
 
 interface StremioManifest {
   id: string; version: string; name: string; description?: string;
@@ -162,7 +168,7 @@ interface StremioStream {
 
 interface StremioSubtitle { id: string; url: string; lang: string; }
 
-// ─── Validation ──────────────────────────────────────────────────────────────────
+// ─── Validation ───────────────────────────────────────────────────────────────
 
 interface ValidationResult {
   valid: boolean; errors: string[]; warnings: string[];
@@ -230,7 +236,7 @@ function validateManifest(raw: unknown): ValidationResult {
   return result;
 }
 
-// ─── HTTP helpers ─────────────────────────────────────────────────────────────────
+// ─── HTTP helpers ─────────────────────────────────────────────────────────────
 
 const CORS: Record<string, string> = {
   "Access-Control-Allow-Origin":  "*",
@@ -251,6 +257,7 @@ function jsonToStremio(data: unknown): Response {
   });
 }
 
+// Manifest: aggressive no-cache so profile switches are near-instant
 function jsonToManifest(data: unknown): Response {
   return new Response(JSON.stringify(data), {
     status: 200,
@@ -261,12 +268,11 @@ function jsonToManifest(data: unknown): Response {
 function escSvg(s: string): string {
   return String(s).replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;").replace(/"/g,"&quot;");
 }
-
 function escHtml(s: string): string {
   return String(s).replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;").replace(/"/g,"&quot;");
 }
 
-// ─── Auth helpers ──────────────────────────────────────────────────────────────────
+// ─── Auth helpers ─────────────────────────────────────────────────────────────
 
 function getAdminPassword(env: Env): string { return env.ADMIN_PASSWORD || DEFAULT_ADMIN_PW; }
 
@@ -280,7 +286,7 @@ function getBearerToken(request: Request): string {
   return h.startsWith("Bearer ") ? h.slice(7) : "";
 }
 
-// ─── Edge-cache helpers ────────────────────────────────────────────────────────────
+// ─── Edge-cache helpers ───────────────────────────────────────────────────────
 
 const CACHE_HOST = "https://pp-cache.internal";
 
@@ -309,7 +315,7 @@ async function flushProxyCacheGen(cfg: ProxyConfig, env: Env): Promise<void> {
   await putConfig(cfg, env);
 }
 
-// ─── Proxy KV helpers ──────────────────────────────────────────────────────────────
+// ─── Proxy KV helpers ─────────────────────────────────────────────────────────
 
 async function getConfig(id: string, env: Env): Promise<ProxyConfig | null> {
   const raw = await env.PROXY_CONFIGS.get(`proxy:${id}`);
@@ -320,7 +326,7 @@ async function putConfig(cfg: ProxyConfig, env: Env): Promise<void> {
   await env.PROXY_CONFIGS.put(`proxy:${cfg.id}`, JSON.stringify(cfg), { expirationTtl: 60 * 60 * 24 * 365 });
 }
 
-// ─── ProfileSet KV helpers ─────────────────────────────────────────────────────────
+// ─── ProfileSet KV helpers ────────────────────────────────────────────────────
 
 async function getProfileSet(id: string, env: Env): Promise<ProfileSet | null> {
   const raw = await env.PROXY_CONFIGS.get(`profileset:${id}`);
@@ -331,7 +337,7 @@ async function putProfileSet(ps: ProfileSet, env: Env): Promise<void> {
   await env.PROXY_CONFIGS.put(`profileset:${ps.id}`, JSON.stringify(ps), { expirationTtl: 60 * 60 * 24 * 365 });
 }
 
-// ─── ProfileSet helpers ────────────────────────────────────────────────────────────
+// ─── ProfileSet helpers ───────────────────────────────────────────────────────
 
 function generateShortId(): string {
   const alpha = "abcdefghijklmnopqrstuvwxyz0123456789";
@@ -393,7 +399,7 @@ function parsePPCatalogId(id: string): { profileId: string; addonIdx: number; or
   return { profileId, addonIdx, origCatalogId };
 }
 
-// ─── SVG Poster for profiles ───────────────────────────────────────────────────────
+// ─── SVG Poster for profiles ──────────────────────────────────────────────────
 
 function buildProfileSvg(name: string, color: string, icon: string, isActive: boolean): string {
   const c = /^#[0-9a-fA-F]{6}$/.test(color) ? color : "#e8a428";
@@ -412,7 +418,7 @@ function buildProfileSvg(name: string, color: string, icon: string, isActive: bo
 </svg>`;
 }
 
-// ─── URL / fetch helpers ─────────────────────────────────────────────────────────────
+// ─── URL / fetch helpers ──────────────────────────────────────────────────────
 
 function applyTemplate(template: string | undefined, vars: Record<string, string | number>): string | undefined {
   if (!template) return undefined;
@@ -441,7 +447,7 @@ async function proxyFetch(url: string, timeoutMs = 9000): Promise<unknown> {
   } finally { clearTimeout(t); }
 }
 
-// ─── Stream quality sorter ──────────────────────────────────────────────────────────
+// ─── Stream quality sorter ────────────────────────────────────────────────────
 
 const QUALITY_MAP: Record<string, number> = {
   "4k": 4, "2160p": 4, "uhd": 4,
@@ -456,7 +462,7 @@ function qualityScore(stream: StremioStream): number {
   return 0;
 }
 
-// ─── Proxy content transformers ────────────────────────────────────────────────────
+// ─── Proxy content transformers ───────────────────────────────────────────────
 
 function patchMeta(meta: StremioMeta, cfg: ProxyConfig): StremioMeta {
   const vars = { id: meta.id, type: meta.type };
@@ -571,7 +577,7 @@ function patchManifest(manifest: StremioManifest, cfg: ProxyConfig, workerUrl: s
   return out;
 }
 
-// ─── Proxy fetch with edge cache ──────────────────────────────────────────────────
+// ─── Proxy fetch with edge cache ──────────────────────────────────────────────
 
 async function fetchWithCache(
   cfg: ProxyConfig, resource: string, type: string, id: string,
@@ -586,27 +592,57 @@ async function fetchWithCache(
   return data;
 }
 
-// ─── Test Proxy (Completely Static — no KV) ────────────────────────────────────────
+// ═══════════════════════════════════════════════════════════════════════════════
+// ─── TEST ADDON (/proxy/test/*) ───────────────────────────────────────────────
+// ═══════════════════════════════════════════════════════════════════════════════
+//
+// PROFILE-SWITCH THEORY TEST GUIDE
+// ─────────────────────────────────
+// To verify that Stremio hides empty catalogs (enabling no-reinstall profile
+// switching), create a Profile Set with 2+ profiles ALL pointing to this URL:
+//
+//   {workerUrl}/proxy/test/manifest.json
+//
+// Install the profile set. You'll see catalogs prefixed with each profile's name.
+// Switch profiles → only the active profile's catalogs return items → others
+// disappear from Stremio's home screen without any reinstall.
+//
+// Catalogs in this addon:
+//   🔴 Alpha Movies    — 6 items, clear "you are in Alpha" messaging
+//   🔵 Beta Movies     — 6 items, clear "you are in Beta" messaging
+//   🟢 Series Shelf A  — 5 series items
+//   🟣 Series Shelf B  — 5 series items
+//   🟡 Featured Mix    — cross-profile sample
+//   🔬 Switch Test     — 6 instructional items proving the theory works
 
 const TEST_MANIFEST: StremioManifest = {
   id: "com.posteriumproxy.test",
   name: "PosteriumProxy Test",
   version: "1.0.0",
-  description: "Static test addon — 4 catalog rows, 2 types. Verifies routing, rendering, and stream playback.",
+  description: [
+    "Static test addon with 6 catalogs & 2 types.",
+    "Add this URL to multiple profiles in a Profile Set to test no-reinstall profile switching.",
+    "Each profile gets its own labeled catalog rows; inactive profiles return [] so Stremio hides them automatically.",
+  ].join(" "),
   resources: ["catalog", "meta", "stream"],
   types: ["movie", "series"],
   catalogs: [
-    { type: "movie",  id: "pp-test-alpha",    name: "🔴 Test Movies — Alpha" },
-    { type: "movie",  id: "pp-test-beta",     name: "🔵 Test Movies — Beta" },
-    { type: "series", id: "pp-test-series",   name: "🟢 Test Series" },
-    { type: "movie",  id: "pp-test-featured", name: "🟡 Featured Mix" },
+    { type: "movie",  id: "pp-test-alpha",   name: "🔴 Alpha Movies" },
+    { type: "movie",  id: "pp-test-beta",    name: "🔵 Beta Movies" },
+    { type: "series", id: "pp-test-seriesA", name: "🟢 Series Shelf A" },
+    { type: "series", id: "pp-test-seriesB", name: "🟣 Series Shelf B" },
+    { type: "movie",  id: "pp-test-featured","name": "🟡 Featured Mix" },
+    { type: "movie",  id: "pp-test-toggle",  name: "🔬 Switch Test" },
   ],
   behaviorHints: { adult: false, p2p: false },
 };
 
 type TestItem = StremioMeta & { _seed: string };
 
-function mkTest(id: string, type: string, name: string, desc: string, seed: string, genre: string, rating: string): TestItem {
+function mkTest(
+  id: string, type: string, name: string, desc: string,
+  seed: string, genre: string, rating: string,
+): TestItem {
   return {
     id, type, name,
     poster: `https://picsum.photos/seed/${seed}/300/450`,
@@ -618,40 +654,107 @@ function mkTest(id: string, type: string, name: string, desc: string, seed: stri
   };
 }
 
+// ── Alpha Movies (6 items) ────────────────────────────────────────────────────
 const TEST_ALPHA: TestItem[] = [
-  mkTest("pptest:a1","movie","Alpha Prime",    "🔴 Alpha · item 1 — if you see this, catalog Alpha is rendering ✓","ppta1","Action","7.5"),
-  mkTest("pptest:a2","movie","Alpha Horizon",  "🔴 Alpha · item 2","ppta2","Sci-Fi","8.1"),
-  mkTest("pptest:a3","movie","Alpha Legacy",   "🔴 Alpha · item 3","ppta3","Drama","6.9"),
-  mkTest("pptest:a4","movie","Alpha Storm",    "🔴 Alpha · item 4","ppta4","Thriller","7.2"),
+  mkTest("pptest:a1","movie","Alpha One ✅",   "🔴 You are in the Alpha profile — this catalog is visible because Alpha is active.","ppta1","Action","7.5"),
+  mkTest("pptest:a2","movie","Alpha Two",      "🔴 Alpha item 2 — switch to Beta and this row disappears.","ppta2","Sci-Fi","8.1"),
+  mkTest("pptest:a3","movie","Alpha Three",    "🔴 Alpha item 3","ppta3","Drama","6.9"),
+  mkTest("pptest:a4","movie","Alpha Four",     "🔴 Alpha item 4","ppta4","Thriller","7.2"),
+  mkTest("pptest:a5","movie","Alpha Five",     "🔴 Alpha item 5","ppta5","Comedy","7.8"),
+  mkTest("pptest:a6","movie","Alpha Six",      "🔴 Alpha item 6","ppta6","Mystery","8.0"),
 ];
+
+// ── Beta Movies (6 items) ─────────────────────────────────────────────────────
 const TEST_BETA: TestItem[] = [
-  mkTest("pptest:b1","movie","Beta Rising",    "🔵 Beta · item 1 — if you see this, catalog Beta is rendering ✓","pptb1","Comedy","7.8"),
-  mkTest("pptest:b2","movie","Beta Protocol",  "🔵 Beta · item 2","pptb2","Action","8.3"),
-  mkTest("pptest:b3","movie","Beta Sequence",  "🔵 Beta · item 3","pptb3","Sci-Fi","7.1"),
-  mkTest("pptest:b4","movie","Beta Paradox",   "🔵 Beta · item 4","pptb4","Mystery","6.8"),
+  mkTest("pptest:b1","movie","Beta One ✅",    "🔵 You are in the Beta profile — this catalog is visible because Beta is active.","pptb1","Comedy","7.8"),
+  mkTest("pptest:b2","movie","Beta Two",       "🔵 Beta item 2 — switch to Alpha and this row disappears.","pptb2","Action","8.3"),
+  mkTest("pptest:b3","movie","Beta Three",     "🔵 Beta item 3","pptb3","Sci-Fi","7.1"),
+  mkTest("pptest:b4","movie","Beta Four",      "🔵 Beta item 4","pptb4","Mystery","6.8"),
+  mkTest("pptest:b5","movie","Beta Five",      "🔵 Beta item 5","pptb5","Drama","7.5"),
+  mkTest("pptest:b6","movie","Beta Six",       "🔵 Beta item 6","pptb6","Thriller","7.9"),
 ];
-const TEST_SERIES_DATA: TestItem[] = [
-  mkTest("pptest:s1","series","Test Show Alpha","🟢 Series · item 1 — if you see this, series catalog is rendering ✓","ppts1","Drama","8.5"),
-  mkTest("pptest:s2","series","Test Show Beta", "🟢 Series · item 2","ppts2","Comedy","7.9"),
-  mkTest("pptest:s3","series","Test Show Gamma","🟢 Series · item 3","ppts3","Thriller","8.2"),
-  mkTest("pptest:s4","series","Test Show Delta","🟢 Series · item 4","ppts4","Sci-Fi","7.6"),
+
+// ── Series Shelf A (5 items) ──────────────────────────────────────────────────
+const TEST_SERIES_A: TestItem[] = [
+  mkTest("pptest:sa1","series","Series A — Show 1 ✅","🟢 Series Shelf A is visible — this profile is active.","pptsa1","Drama","8.5"),
+  mkTest("pptest:sa2","series","Series A — Show 2",   "🟢 Series A item 2","pptsa2","Sci-Fi","8.2"),
+  mkTest("pptest:sa3","series","Series A — Show 3",   "🟢 Series A item 3","pptsa3","Thriller","7.8"),
+  mkTest("pptest:sa4","series","Series A — Show 4",   "🟢 Series A item 4","pptsa4","Comedy","8.1"),
+  mkTest("pptest:sa5","series","Series A — Show 5",   "🟢 Series A item 5","pptsa5","Action","7.6"),
 ];
+
+// ── Series Shelf B (5 items) ──────────────────────────────────────────────────
+const TEST_SERIES_B: TestItem[] = [
+  mkTest("pptest:sb1","series","Series B — Show 1 ✅","🟣 Series Shelf B is visible — this profile is active.","pptsb1","Action","8.0"),
+  mkTest("pptest:sb2","series","Series B — Show 2",   "🟣 Series B item 2","pptsb2","Drama","7.9"),
+  mkTest("pptest:sb3","series","Series B — Show 3",   "🟣 Series B item 3","pptsb3","Mystery","8.3"),
+  mkTest("pptest:sb4","series","Series B — Show 4",   "🟣 Series B item 4","pptsb4","Comedy","7.5"),
+  mkTest("pptest:sb5","series","Series B — Show 5",   "🟣 Series B item 5","pptsb5","Thriller","7.7"),
+];
+
+// ── Featured Mix ──────────────────────────────────────────────────────────────
 const TEST_FEATURED: TestItem[] = [
-  TEST_ALPHA[0], TEST_BETA[0], TEST_SERIES_DATA[0],
-  TEST_ALPHA[1], TEST_BETA[1], TEST_SERIES_DATA[1],
+  TEST_ALPHA[0], TEST_BETA[0],
+  TEST_SERIES_A[0], TEST_SERIES_B[0],
+  TEST_ALPHA[1], TEST_BETA[1],
 ];
-const TEST_ALL = [...TEST_ALPHA, ...TEST_BETA, ...TEST_SERIES_DATA];
+
+// ── Switch Test (6 instructional items) ───────────────────────────────────────
+// These items guide the user through verifying the no-reinstall theory.
+const TEST_TOGGLE: TestItem[] = [
+  mkTest("pptest:t1","movie","✅ Theory Check: You're Here!",
+    "This '🔬 Switch Test' catalog is visible because its parent profile is active. " +
+    "Now go back and tap a DIFFERENT profile card in the Profiles row.",
+    "pptt1","Test","9.5"),
+  mkTest("pptest:t2","movie","👆 Step 1: Tap Another Profile",
+    "Go to the Profiles catalog row at the top. Tap any other profile card. " +
+    "Stremio will open that profile's detail page — press the play button to activate it.",
+    "pptt2","Test","9.5"),
+  mkTest("pptest:t3","movie","⏪ Step 2: Press Back",
+    "After activating the other profile, press back. " +
+    "This entire '🔬 Switch Test' catalog row should now be GONE from the home screen.",
+    "pptt3","Test","9.5"),
+  mkTest("pptest:t4","movie","🔄 Step 3: Switch Back",
+    "Tap the original profile card again to reactivate it. Press back. " +
+    "This catalog row should reappear — no reinstall, no URL change.",
+    "pptt4","Test","9.5"),
+  mkTest("pptest:t5","movie","✨ Theory Confirmed",
+    "Stremio hides catalogs that return 0 items. " +
+    "All profile catalogs are always in the manifest — only the active one is populated. " +
+    "One URL, multiple profiles, zero reinstalls.",
+    "pptt5","Test","9.5"),
+  mkTest("pptest:t6","movie","📋 How to Reproduce",
+    "Create a Profile Set on the PosteriumProxy website. " +
+    "Add 2+ profiles, all using this addon URL. Install the generated manifest URL in Stremio. Done.",
+    "pptt6","Test","9.5"),
+];
+
+// ── Lookup maps ───────────────────────────────────────────────────────────────
+const TEST_ALL = [
+  ...TEST_ALPHA, ...TEST_BETA,
+  ...TEST_SERIES_A, ...TEST_SERIES_B,
+  ...TEST_TOGGLE,
+];
+
 const TEST_CATALOG_MAP: Record<string, TestItem[]> = {
   "pp-test-alpha":    TEST_ALPHA,
   "pp-test-beta":     TEST_BETA,
-  "pp-test-series":   TEST_SERIES_DATA,
+  "pp-test-seriesA":  TEST_SERIES_A,
+  "pp-test-seriesB":  TEST_SERIES_B,
   "pp-test-featured": TEST_FEATURED,
+  "pp-test-toggle":   TEST_TOGGLE,
 };
 
-function handleTestManifest(): Response { return jsonToStremio(TEST_MANIFEST); }
+// ── Test route handlers ───────────────────────────────────────────────────────
+
+function handleTestManifest(): Response {
+  return jsonToManifest(TEST_MANIFEST);
+}
 
 function handleTestCatalog(catalogId: string): Response {
-  return jsonToStremio({ metas: TEST_CATALOG_MAP[catalogId] ?? [] });
+  const items = TEST_CATALOG_MAP[catalogId];
+  if (!items) return jsonToStremio({ metas: [] });
+  return jsonToStremio({ metas: items });
 }
 
 function handleTestMeta(type: string, itemId: string): Response {
@@ -663,159 +766,81 @@ function handleTestStream(type: string, itemId: string): Response {
   const item = TEST_ALL.find(m => m.id === itemId);
   if (!item) return jsonToStremio({ streams: [] });
   return jsonToStremio({
-    streams: [{
-      url: "https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/BigBuckBunny.mp4",
-      name: "Test Stream ✓",
-      title: `${item.name} — PosteriumProxy Test`,
-      description: "Big Buck Bunny (public domain). If this plays, streams are working correctly ✓",
-    }, {
-      url: "https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/ElephantsDream.mp4",
-      name: "Test Stream 2 ✓",
-      title: `${item.name} — Alternate Test`,
-      description: "Elephants Dream (public domain). Second stream to verify multi-stream display ✓",
-    }],
+    streams: [
+      {
+        url: "https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/BigBuckBunny.mp4",
+        name: "Test Stream ✓",
+        title: `${item.name} — PosteriumProxy Test`,
+        description: "Big Buck Bunny (public domain). If this plays, streams are working correctly ✓",
+      },
+      {
+        url: "https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/ElephantsDream.mp4",
+        name: "Test Stream 2 ✓",
+        title: `${item.name} — Alternate`,
+        description: "Elephants Dream (public domain). Second stream to verify multi-stream display ✓",
+      },
+    ],
   });
 }
 
-// ─── Test ProfileSet (Hardcoded — no KV required) ──────────────────────────────
-
-const TEST_PROFILESET_ID = "test-switch-me";
-
-function buildTestProfileSet(workerUrl: string): ProfileSet {
-  const now = Date.now();
-  const testAddonUrl = `${workerUrl}/proxy/test/manifest.json`;
-  
-  return {
-    id: TEST_PROFILESET_ID,
-    password: "test",
-    name: "🔬 Test Profiles (Switch Me!)",
-    profiles: [
-      {
-        id: "test-alpha",
-        name: "🔴 Alpha",
-        icon: "α",
-        color: "#e8a428",
-        addons: [
-          {
-            manifestUrl: testAddonUrl,
-            label: "Test Addon Alpha",
-            cachedManifest: {
-              name: "Test Addon Alpha",
-              id: "test.addon.alpha",
-              types: ["movie", "series"],
-              resources: ["catalog", "meta", "stream"],
-              catalogs: [
-                { type: "movie", id: "pp-test-alpha", name: "🔴 Alpha Movies" },
-                { type: "series", id: "pp-test-series", name: "🟢 Alpha Series" },
-              ],
-            } as CachedManifest,
-          },
-        ],
-      },
-      {
-        id: "test-beta",
-        name: "🔵 Beta",
-        icon: "β",
-        color: "#2980b9",
-        addons: [
-          {
-            manifestUrl: testAddonUrl,
-            label: "Test Addon Beta",
-            cachedManifest: {
-              name: "Test Addon Beta",
-              id: "test.addon.beta",
-              types: ["movie", "series"],
-              resources: ["catalog", "meta", "stream"],
-              catalogs: [
-                { type: "movie", id: "pp-test-beta", name: "🔵 Beta Movies" },
-                { type: "series", id: "pp-test-series", name: "🟢 Beta Series" },
-              ],
-            } as CachedManifest,
-          },
-        ],
-      },
-      {
-        id: "test-all",
-        name: "✅ All Together",
-        icon: "✓",
-        color: "#27ae60",
-        addons: [
-          {
-            manifestUrl: testAddonUrl,
-            label: "Test Addon Alpha",
-            cachedManifest: {
-              name: "Test Addon Alpha",
-              id: "test.addon.alpha",
-              types: ["movie", "series"],
-              resources: ["catalog", "meta", "stream"],
-              catalogs: [
-                { type: "movie", id: "pp-test-alpha", name: "🔴 Alpha Movies" },
-                { type: "series", id: "pp-test-series", name: "🟢 Alpha Series" },
-              ],
-            } as CachedManifest,
-          },
-          {
-            manifestUrl: testAddonUrl,
-            label: "Test Addon Beta",
-            cachedManifest: {
-              name: "Test Addon Beta",
-              id: "test.addon.beta",
-              types: ["movie", "series"],
-              resources: ["catalog", "meta", "stream"],
-              catalogs: [
-                { type: "movie", id: "pp-test-beta", name: "🔵 Beta Movies" },
-                { type: "series", id: "pp-test-series", name: "🟢 Beta Series" },
-              ],
-            } as CachedManifest,
-          },
-        ],
-      },
-    ],
-    activeProfileId: "test-alpha",
-    cacheGeneration: 0,
-    createdAt: now,
-    updatedAt: now,
-  };
-}
-
-// ─── ProfileSet addon handlers ─────────────────────────────────────────────────────
+// ═══════════════════════════════════════════════════════════════════════════════
+// ─── PROFILESET ADDON HANDLERS ────────────────────────────────────────────────
+// ═══════════════════════════════════════════════════════════════════════════════
 
 function handlePSManifest(ps: ProfileSet, workerUrl: string): Response {
-  const active = getActiveProfile(ps);
   const contentTypes = new Set<string>();
   const allIdPrefixes = new Set<string>(["profile:"]);
   let hasUnrestrictedIds = false;
+  const seenCatalogIds = new Set<string>();
 
   const catalogs: StremioManifestCatalog[] = [
+    // Always first: the profiles selector row
     { type: "movie", id: "pp-profiles", name: "👤 Profiles" },
   ];
 
-  if (active) {
-    for (const [addonIdx, addon] of active.addons.entries()) {
+  // ── KEY CHANGE: iterate ALL profiles, not just the active one ───────────────
+  //
+  // Why: Stremio only asks for a reinstall when the manifest structure changes
+  // (new catalog IDs appear). By including every profile's catalogs up front,
+  // the manifest is structurally identical regardless of which profile is active.
+  //
+  // The catalog handlers return [] for inactive profiles. Stremio hides any
+  // catalog row that returns 0 items. Result: switching profiles requires no
+  // reinstall — it's purely a data-layer toggle.
+  for (const profile of ps.profiles) {
+    for (const [addonIdx, addon] of profile.addons.entries()) {
       const m = addon.cachedManifest;
       if (!m) continue;
       (m.types ?? []).forEach(t => contentTypes.add(t));
       if (!m.idPrefixes?.length) hasUnrestrictedIds = true;
       else m.idPrefixes.forEach(p => allIdPrefixes.add(p));
       for (const cat of m.catalogs ?? []) {
+        const catId = `pp-${profile.id}-${addonIdx}-${cat.id}`;
+        if (seenCatalogIds.has(catId)) continue; // skip exact duplicates
+        seenCatalogIds.add(catId);
         catalogs.push({
           type: cat.type,
-          id: `pp-${active.id}-${addonIdx}-${cat.id}`,
-          name: `${active.name} — ${cat.name ?? cat.id}`,
+          id: catId,
+          name: `${profile.name} — ${cat.name ?? cat.id}`,
           extra: cat.extra as StremioManifestCatalog["extra"],
         });
       }
     }
   }
 
+  // "movie" always present so the PROFILES row works
   const allTypes = ["movie", ...contentTypes].filter((v, i, a) => a.indexOf(v) === i);
   const idPrefixesForResource = hasUnrestrictedIds ? undefined : [...allIdPrefixes];
 
   const manifest: StremioManifest = {
     id: `com.posteriumproxy.ps.${ps.id}`,
     name: ps.name,
+    // Version is intentionally STATIC — never bumped on profile switches.
+    // A version bump would cause Stremio to treat this as a new addon.
     version: "1.0.0",
-    description: `${ps.profiles.length} profile${ps.profiles.length !== 1 ? "s" : ""} · Active: ${active?.name ?? "None"} · PosteriumProxy`,
+    // Description intentionally does NOT mention the active profile name,
+    // so the manifest text stays identical across profile switches.
+    description: `${ps.profiles.length} profile${ps.profiles.length !== 1 ? "s" : ""} · PosteriumProxy`,
     resources: [
       "catalog",
       { name: "meta",   types: allTypes, ...(idPrefixesForResource ? { idPrefixes: idPrefixesForResource } : {}) },
@@ -831,12 +856,11 @@ function handlePSManifest(ps: ProfileSet, workerUrl: string): Response {
 
 function handlePSPoster(ps: ProfileSet, posterType: string): Response {
   const profile = ps.profiles.find(p => p.id === posterType);
-  const name  = profile?.name ?? "?";
-  const color = profile?.color ?? "#e8a428";
-  const icon  = profile?.icon ?? "";
+  const name    = profile?.name  ?? "?";
+  const color   = profile?.color ?? "#e8a428";
+  const icon    = profile?.icon  ?? "";
   const isActive = profile ? profile.id === ps.activeProfileId : false;
-  const svg = buildProfileSvg(name, color, icon, isActive);
-  return new Response(svg, {
+  return new Response(buildProfileSvg(name, color, icon, isActive), {
     headers: { "Content-Type": "image/svg+xml", "Cache-Control": "public, max-age=60", ...CORS },
   });
 }
@@ -844,6 +868,7 @@ function handlePSPoster(ps: ProfileSet, posterType: string): Response {
 async function handlePSCatalog(
   ps: ProfileSet, type: string, catalogId: string, extra: string, workerUrl: string,
 ): Promise<Response> {
+  // ── Profiles selector row ──────────────────────────────────────────────────
   if (catalogId === "pp-profiles") {
     const metas: StremioMeta[] = ps.profiles.map(profile => {
       const isActive = profile.id === ps.activeProfileId;
@@ -860,10 +885,14 @@ async function handlePSCatalog(
     return jsonToStremio({ metas });
   }
 
+  // ── Proxied catalog ────────────────────────────────────────────────────────
   const parsed = parsePPCatalogId(catalogId);
   if (!parsed) return jsonToStremio({ metas: [] });
 
   const { profileId, addonIdx, origCatalogId } = parsed;
+
+  // Return empty for inactive profiles — Stremio hides the row automatically.
+  // This is the mechanism that makes no-reinstall profile switching work.
   if (profileId !== ps.activeProfileId) return jsonToStremio({ metas: [] });
 
   const active = getActiveProfile(ps);
@@ -884,9 +913,10 @@ async function handlePSCatalog(
 async function handlePSMeta(
   ps: ProfileSet, type: string, itemId: string, _env: Env, workerUrl: string,
 ): Promise<Response> {
+  // ── Profile detail page ────────────────────────────────────────────────────
   if (itemId.startsWith("profile:")) {
     const profileId = itemId.slice(8);
-    const profile = ps.profiles.find(p => p.id === profileId);
+    const profile   = ps.profiles.find(p => p.id === profileId);
     if (!profile) return jsonToStremio({ meta: null });
     const isActive = profile.id === ps.activeProfileId;
     return jsonToStremio({
@@ -896,11 +926,12 @@ async function handlePSMeta(
         name: profile.name,
         poster: `${workerUrl}/${ps.id}/poster/${profile.id}.svg`,
         posterShape: "square",
-        description: `${profile.addons.length} addon${profile.addons.length !== 1 ? "s" : ""}` +
-                     (isActive ? " · Currently active" : " · Tap to switch"),
+        description:
+          `${profile.addons.length} addon${profile.addons.length !== 1 ? "s" : ""}` +
+          (isActive ? " · Currently active" : " · Tap ▶ to activate this profile"),
         videos: [{
           id: `profile:${profile.id}`,
-          title: isActive ? "✅ Active — tap to confirm" : "▶ Tap to activate this profile",
+          title: isActive ? "✅ Already active — this profile is loaded" : "▶ Tap to activate this profile",
           released: new Date(ps.createdAt).toISOString(),
         }],
         behaviorHints: { defaultVideoId: `profile:${profile.id}` },
@@ -908,6 +939,7 @@ async function handlePSMeta(
     });
   }
 
+  // ── Aggregate meta from active profile's addons ───────────────────────────
   const active = getActiveProfile(ps);
   if (!active) return jsonToStremio({ meta: null });
 
@@ -925,9 +957,14 @@ async function handlePSMeta(
 async function handlePSStream(
   ps: ProfileSet, type: string, itemId: string, env: Env, _workerUrl: string,
 ): Promise<Response> {
+  // ── Profile activation ─────────────────────────────────────────────────────
+  // Stremio fires a stream request when the user taps a profile card (via
+  // defaultVideoId). We flip activeProfileId here — no button, no browser,
+  // no redirect. The manifest is no-store, so Stremio re-fetches it
+  // immediately; the active profile's catalogs now return items and appear.
   if (itemId.startsWith("profile:")) {
     const profileId = itemId.slice(8);
-    const profile = ps.profiles.find(p => p.id === profileId);
+    const profile   = ps.profiles.find(p => p.id === profileId);
     if (!profile) return jsonToStremio({ streams: [] });
 
     if (ps.activeProfileId !== profileId) {
@@ -937,9 +974,12 @@ async function handlePSStream(
       await putProfileSet(ps, env);
     }
 
+    // Empty streams → Stremio shows "no streams available" briefly,
+    // user presses back, manifest re-fetches, new profile's catalogs appear.
     return jsonToStremio({ streams: [] });
   }
 
+  // ── Aggregate streams from active profile (parallel) ──────────────────────
   const active = getActiveProfile(ps);
   if (!active) return jsonToStremio({ streams: [] });
 
@@ -978,11 +1018,12 @@ async function handlePSSubtitles(
     })
   );
 
-  const subtitles = results.flatMap(r => r.status === "fulfilled" ? r.value : []);
-  return jsonToStremio({ subtitles });
+  return jsonToStremio({ subtitles: results.flatMap(r => r.status === "fulfilled" ? r.value : []) });
 }
 
-// ─── ProfileSet API handlers ───────────────────────────────────────────────────────
+// ═══════════════════════════════════════════════════════════════════════════════
+// ─── PROFILESET API HANDLERS ──────────────────────────────────────────────────
+// ═══════════════════════════════════════════════════════════════════════════════
 
 async function handleCreatePS(req: Request, env: Env, workerUrl: string): Promise<Response> {
   let body: {
@@ -1072,7 +1113,7 @@ async function handleUpdatePS(id: string, req: Request, env: Env, workerUrl: str
     ps.profiles = (body.profiles as Array<Record<string, unknown>>).map((p, pi) => {
       const rawAddons = Array.isArray(p.addons) ? p.addons as Array<Record<string, unknown>> : [];
       const addons: AddonEntry[] = rawAddons
-        .filter(a => typeof a.url === "string" && a.url.trim())
+        .filter(a => typeof a.url === "string" && (a.url as string).trim())
         .map((a, ai) => {
           fetchTasks.push({ pi, ai, url: (a.url as string).trim() });
           return { manifestUrl: (a.url as string).trim(), label: typeof a.label === "string" ? a.label.trim() || undefined : undefined };
@@ -1121,7 +1162,9 @@ async function handleDeletePS(id: string, req: Request, env: Env): Promise<Respo
   return json({ deleted: true });
 }
 
-// ─── Proxy API handlers ────────────────────────────────────────────────────────────
+// ═══════════════════════════════════════════════════════════════════════════════
+// ─── PROXY API HANDLERS ───────────────────────────────────────────────────────
+// ═══════════════════════════════════════════════════════════════════════════════
 
 async function handlePreview(req: Request): Promise<Response> {
   let body: { upstreamManifestUrl?: string };
@@ -1211,10 +1254,14 @@ async function handleCreate(req: Request, env: Env, workerUrl: string): Promise<
   const id = crypto.randomUUID();
   const cfg = buildConfig(body, validation.types, id);
   await putConfig(cfg, env);
-  const manifestUrl  = `${workerUrl}/${id}/manifest.json`;
-  const stremioUrl   = `stremio://${new URL(manifestUrl).host}/${id}/manifest.json`;
-  const configureUrl = `${workerUrl}/${id}/configure`;
-  return json({ id, manifestUrl, stremioUrl, configureUrl, config: cfg, upstreamManifest: validation.manifest });
+  return json({
+    id,
+    manifestUrl:  `${workerUrl}/${id}/manifest.json`,
+    stremioUrl:   `stremio://${new URL(workerUrl).host}/${id}/manifest.json`,
+    configureUrl: `${workerUrl}/${id}/configure`,
+    config: cfg,
+    upstreamManifest: validation.manifest,
+  });
 }
 
 async function handleUpdate(req: Request, id: string, env: Env, workerUrl: string): Promise<Response> {
@@ -1238,9 +1285,13 @@ async function handleUpdate(req: Request, id: string, env: Env, workerUrl: strin
   const updated = buildConfig(body, validation ? validation.types : body.allowedTypes ?? [], id);
   updated.cacheGeneration = cfg.cacheGeneration + 1;
   await putConfig(updated, env);
-  const manifestUrl  = `${workerUrl}/${id}/manifest.json`;
-  const stremioUrl   = `stremio://${new URL(manifestUrl).host}/${id}/manifest.json`;
-  return json({ id, manifestUrl, stremioUrl, configureUrl: `${workerUrl}/${id}/configure`, updated: true });
+  return json({
+    id,
+    manifestUrl:  `${workerUrl}/${id}/manifest.json`,
+    stremioUrl:   `stremio://${new URL(workerUrl).host}/${id}/manifest.json`,
+    configureUrl: `${workerUrl}/${id}/configure`,
+    updated: true,
+  });
 }
 
 async function handleGetConfig(id: string, req: Request, env: Env): Promise<Response> {
@@ -1280,7 +1331,7 @@ async function handleList(env: Env): Promise<Response> {
   return json({ proxies: items.filter(Boolean) });
 }
 
-// ─── Proxy addon route handlers ────────────────────────────────────────────────────
+// ── Proxy addon route handlers ─────────────────────────────────────────────────
 
 async function handleManifest(id: string, env: Env, workerUrl: string): Promise<Response> {
   const cfg = await getConfig(id, env);
@@ -1372,7 +1423,9 @@ async function handleAddonCatalog(id: string, type: string, catalogId: string, e
   try { return jsonToStremio(await proxyFetch(url)); } catch (e) { return err(`Upstream error: ${(e as Error).message}`, 502); }
 }
 
-// ─── Admin handlers ────────────────────────────────────────────────────────────────
+// ═══════════════════════════════════════════════════════════════════════════════
+// ─── ADMIN ────────────────────────────────────────────────────────────────────
+// ═══════════════════════════════════════════════════════════════════════════════
 
 async function handleAdminList(env: Env): Promise<Response> {
   const [pList, psList] = await Promise.all([
@@ -1407,8 +1460,6 @@ async function handleAdminFlush(id: string, env: Env): Promise<Response> {
   if (ps) { ps.cacheGeneration++; ps.updatedAt = Date.now(); await putProfileSet(ps, env); return json({ flushed: true }); }
   return err("Not found", 404);
 }
-
-// ─── Admin page HTML ─────────────────────────────────────────────────────────────────
 
 function adminPageHtml(workerUrl: string): string {
   return `<!DOCTYPE html><html lang="en"><head>
@@ -1461,7 +1512,9 @@ async function del(id){if(!confirm('Delete '+id+'?'))return;const r=await fetch(
 </script></body></html>`;
 }
 
-// ─── Main router ──────────────────────────────────────────────────────────────────
+// ═══════════════════════════════════════════════════════════════════════════════
+// ─── MAIN ROUTER ──────────────────────────────────────────────────────────────
+// ═══════════════════════════════════════════════════════════════════════════════
 
 export default {
   async fetch(request: Request, env: Env): Promise<Response> {
@@ -1472,7 +1525,7 @@ export default {
     const segments  = url.pathname.replace(/^\//, "").split("/").filter(Boolean);
     const [s0, s1, s2, s3] = segments;
 
-    // ── /manage ───────────────────────────────────────────────────────────────
+    // ── /manage ──────────────────────────────────────────────────────────────
     if (s0 === "manage") {
       const authHeader = request.headers.get("Authorization");
       if (!authHeader || !checkBasicAuth(authHeader, env))
@@ -1480,48 +1533,7 @@ export default {
       return new Response(adminPageHtml(workerUrl), { headers: { "Content-Type": "text/html" } });
     }
 
-// ── /test/* ───────────────────────────────────────────────────────────────
-if (s0 === "test") {
-  const ps = buildTestProfileSet(workerUrl);
-  const resource = s1;
-  if (!resource || resource === "manifest.json") return handlePSManifest(ps, workerUrl);
-
-  if (resource === "poster") {
-    const posterType = s2?.replace(/\.svg$/, "");
-    if (posterType) return handlePSPoster(ps, posterType);
-  }
-
-  if (resource === "catalog" && s2) {
-    const type = s2;
-    const raw  = segments.slice(3).join("/").replace(/\.json$/, "");
-    const si   = raw.indexOf("/");
-    const catId = si === -1 ? raw : raw.slice(0, si);
-    const extra = si === -1 ? ""  : raw.slice(si + 1);
-    return handlePSCatalog(ps, type, catId, extra, workerUrl);
-  }
-
-  if (resource === "meta" && s2) {
-    const type   = s2;
-    const itemId = decodeURIComponent(segments.slice(3).join("/").replace(/\.json$/, ""));
-    return handlePSMeta(ps, type, itemId, env, workerUrl);
-  }
-
-  if (resource === "stream" && s2) {
-    const type   = s2;
-    const itemId = decodeURIComponent(segments.slice(3).join("/").replace(/\.json$/, ""));
-    return handlePSStream(ps, type, itemId, env, workerUrl);
-  }
-
-  if (resource === "subtitles" && s2) {
-    const type   = s2;
-    const itemId = decodeURIComponent(segments.slice(3).join("/").replace(/\.json$/, ""));
-    return handlePSSubtitles(ps, type, itemId, env);
-  }
-
-  return err("Not found in /test", 404);
-}
-
-    // ── /proxy/test/* (static test addon — no KV) ─────────────────────────────
+    // ── /proxy/test/* — static test addon (no KV) ─────────────────────────────
     if (s0 === "proxy" && s1 === "test") {
       const resource = s2;
       const rest = segments.slice(3);
@@ -1550,7 +1562,6 @@ if (s0 === "test") {
       }
       if (s1 === "flush" && s2 && request.method === "POST") return handleFlushCache(s2, request, env);
 
-      // ProfileSet API
       if (s1 === "profilesets") {
         if (s2 === "create" && request.method === "POST") return handleCreatePS(request, env, workerUrl);
         if (s2 && !s3) {
@@ -1560,13 +1571,12 @@ if (s0 === "test") {
         }
       }
 
-      // Admin API
       if (s1 === "admin") {
         const authHeader = request.headers.get("Authorization");
         if (!authHeader || !checkBasicAuth(authHeader, env)) return err("Unauthorized", 401);
-        if (s2 === "list"  && request.method === "GET")  return handleAdminList(env);
+        if (s2 === "list"  && request.method === "GET")       return handleAdminList(env);
         if (s2 === "flush" && s3 && request.method === "POST") return handleAdminFlush(s3, env);
-        if (s2 && request.method === "DELETE") return handleAdminDelete(s2, env);
+        if (s2 && request.method === "DELETE")                 return handleAdminDelete(s2, env);
       }
 
       return err("Not found", 404);
@@ -1578,6 +1588,7 @@ if (s0 === "test") {
 
       if (resource === "configure") return env.ASSETS.fetch(request);
 
+      // Try proxy ─────────────────────────────────────────────────────────────
       const cfg = await getConfig(addonId, env);
       if (cfg) {
         if (resource === "manifest.json") return handleManifest(addonId, env, workerUrl);
@@ -1608,6 +1619,7 @@ if (s0 === "test") {
         return env.ASSETS.fetch(request);
       }
 
+      // Try profileset ─────────────────────────────────────────────────────────
       const ps = await getProfileSet(addonId, env);
       if (ps) {
         if (resource === "manifest.json") return handlePSManifest(ps, workerUrl);
